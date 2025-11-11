@@ -1,7 +1,7 @@
-# Project
+# Project dependencies
 node_modules/
-server/
-client/
+client/node_modules/
+server/node_modules/
 
 # Environment variables
 .env
