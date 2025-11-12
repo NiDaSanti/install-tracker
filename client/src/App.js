@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import axios from 'axios';
+import apiClient from './apiClient';
 import './App.css';
 import InstallationList from './Components/InstallationList';
 import InstallationForm from './Components/InstallationForm';
@@ -30,7 +30,7 @@ function App() {
   // Fetch installation from backend API
   const fetchInstallations = async () => {
     try {
-      const response = await axios.get('/api/installations');
+  const response = await apiClient.get('/api/installations');
       setInstallations(response.data);
       setLoading(false);
     } catch (err) {
@@ -150,7 +150,7 @@ function App() {
 
           {activeTab === 'map' && (
             <div className="tab-panel map-panel">
-              <InstallationMap installations={installations} />
+              <InstallationMap installations={installations} theme={theme} />
             </div>
           )}
         </div>

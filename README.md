@@ -49,6 +49,7 @@ Edit `.env` and configure:
 ```
 PORT=3000
 NODE_ENV=development
+CLIENT_URL=http://localhost:3001
 ```
 
 ### 3. Frontend Setup
@@ -60,7 +61,7 @@ cp .env.example .env
 
 Edit `.env`:
 ```
-REACT_APP_API_URL=http://localhost:3000
+REACT_APP_API_BASE_URL=http://localhost:3000
 ```
 
 ### 4. Run the Application
@@ -85,7 +86,8 @@ The app will open at `http://localhost:3001`
 install-tracker/
 ├── server/
 │   ├── data/
-│   │   └── installations.json    # Data storage
+│   │   ├── installations.development.json
+│   │   └── installations.production.json
 │   ├── routes/
 │   │   ├── index.js              # Main routes
 │   │   └── installations.js      # Installation CRUD
@@ -131,29 +133,31 @@ CLIENT_URL=http://localhost:3001
 
 ### Client (.env)
 ```
-REACT_APP_API_URL=http://localhost:3000
+REACT_APP_API_BASE_URL=http://localhost:3000
 ```
 
 ## Deployment
 
-### Backend Deployment (Render/Railway)
+### Backend Deployment (Render)
 
-1. Push code to GitHub
-2. Create new web service
-3. Set build command: `cd server && npm install`
-4. Set start command: `cd server && npm start`
-5. Add environment variables:
+1. Push code to GitHub.
+2. Create a new **Web Service** in Render pointed at the repository root.
+3. Build command: `cd server && npm install`.
+4. Start command: `cd server && npm start`.
+5. Add a persistent disk (1 GB is plenty) mounted at `/opt/render/project/src/server/data` so JSON data survives deploys.
+6. Configure environment variables:
    - `NODE_ENV=production`
-   - `CLIENT_URL=<your-frontend-url>`
+   - `CLIENT_URL=https://<your-frontend-onrender-url>`
+   - `INSTALLATIONS_DATA_FILE=installations.production.json` (optional override; defaults to production file when `NODE_ENV=production`).
 
-### Frontend Deployment (Vercel/Netlify)
+### Frontend Deployment (Render Static Site)
 
-1. Push code to GitHub
-2. Connect repository
-3. Set build command: `cd client && npm run build`
-4. Set publish directory: `client/build`
-5. Add environment variable:
-   - `REACT_APP_API_URL=<your-backend-url>`
+1. Create a **Static Site** on Render using the same repo.
+2. Build command: `cd client && npm install && npm run build`.
+3. Publish directory: `client/build`.
+4. Environment variable:
+   - `REACT_APP_API_BASE_URL=https://<your-backend-onrender-url>`
+5. After the first deploy note the static site URL and update the backend `CLIENT_URL` value to match exactly.
 
 ## Features to Add
 

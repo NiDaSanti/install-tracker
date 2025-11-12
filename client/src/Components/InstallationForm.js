@@ -1,5 +1,5 @@
 import React from 'react';
-import axios from 'axios';
+import apiClient from '../apiClient';
 import {geocodeAddress} from '../utils/geocode'
 
 const InstallationForm = ({ onSubmit }) => {
@@ -40,7 +40,7 @@ const InstallationForm = ({ onSubmit }) => {
       };
       
       // Send POST request to backend API
-      const response = await axios.post('/api/installations', newInstallation);
+  const response = await apiClient.post('/api/installations', newInstallation);
       
       console.log('Installation created:', response.data);
       

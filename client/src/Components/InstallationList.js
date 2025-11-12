@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import axios from "axios";
+import apiClient from "../apiClient";
 
 // Display all Installations
 function InstallationList({ installations, onDelete, onUpdate }) {
@@ -9,7 +9,7 @@ function InstallationList({ installations, onDelete, onUpdate }) {
   // Delete handler
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`/api/installations/${id}`);
+  await apiClient.delete(`/api/installations/${id}`);
       onDelete(id);
     } catch (error) {
       console.error("Failed to delete installation:", error);
@@ -41,7 +41,7 @@ function InstallationList({ installations, onDelete, onUpdate }) {
   // Save changes
   const handleSave = async (id) => {
     try {
-      const response = await axios.put(`/api/installations/${id}`, editForm);
+  const response = await apiClient.put(`/api/installations/${id}`, editForm);
       onUpdate(response.data);
       setEditingId(null);
       setEditForm({});
