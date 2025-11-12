@@ -1,0 +1,18 @@
+[
+  {
+    "id": "1762981131330",
+    "homeownerName": "Test User",
+    "address": "123 Street",
+    "city": "Town",
+    "state": "CA",
+    "zip": "90210",
+    "systemSize": "5",
+    "installDate": "2024-01-01",
+    "notes": "",
+    "latitude": null,
+    "longitude": null,
+    "createdAt": "2025-11-12T20:58:51.330Z",
+    "ownerId": "env-3",
+    "ownerUsername": "nisantiago03"
+  }
+]

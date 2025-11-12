@@ -1,13 +1,15 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import apiClient from './apiClient';
 import './App.css';
 import InstallationList from './Components/InstallationList';
 import InstallationForm from './Components/InstallationForm';
 import InstallationMap from './Components/InstallationMap';
+import Login from './Components/Login';
+import { getToken, setToken as storeToken, clearToken as eraseToken } from './auth';
 
 function App() {
   const [installations, setInstallations] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('form');
   const [theme, setTheme] = useState(() => {
@@ -27,20 +29,39 @@ function App() {
     return 'light';
   });
 
-  // Fetch installation from backend API
+  const [authToken, setAuthToken] = useState(() => {
+    if (typeof window === 'undefined') {
+      return null;
+    }
+
+    return getToken();
+  });
+
+  const [currentUser, setCurrentUser] = useState(null);
+
   const fetchInstallations = async () => {
     try {
-  const response = await apiClient.get('/api/installations');
+      setLoading(true);
+      const response = await apiClient.get('/api/installations');
       setInstallations(response.data);
-      setLoading(false);
+      setError(null);
     } catch (err) {
       setError(err);
+    } finally {
       setLoading(false);
     }
-  }
+  };
+
   useEffect(() => {
+    if (!authToken) {
+      setInstallations([]);
+      setError(null);
+      setLoading(false);
+      return;
+    }
+
     fetchInstallations();
-  }, []);
+  }, [authToken]);
 
   useEffect(() => {
     if (typeof document !== 'undefined') {
@@ -58,19 +79,63 @@ function App() {
 
   const isDarkTheme = theme === 'dark';
 
+  const handleLoginSuccess = (token, user) => {
+    storeToken(token);
+    setAuthToken(token);
+    setCurrentUser(user ?? null);
+    setError(null);
+  };
+
+  const handleLogout = () => {
+    eraseToken();
+    setAuthToken(null);
+    setCurrentUser(null);
+    setInstallations([]);
+    setError(null);
+  };
+
+  useEffect(() => {
+    const handleUnauthorized = () => {
+      eraseToken();
+      setAuthToken(null);
+      setCurrentUser(null);
+      setInstallations([]);
+      setError(null);
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('install-tracker:unauthorized', handleUnauthorized);
+    }
+
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('install-tracker:unauthorized', handleUnauthorized);
+      }
+    };
+  }, []);
+
   const handleInstallationAdded = (newInstallation) => {
-    setInstallations([...installations, newInstallation]);
+    setInstallations((prev) => [...prev, newInstallation]);
   };
 
   const handleInstallationDeleted = (deletedId) => {
-    setInstallations(installations.filter(inst => inst.id !== deletedId));
-  }
+    setInstallations((prev) => prev.filter((inst) => inst.id !== deletedId));
+  };
 
   const handleInstallationUpdated = (updatedInstallation) => {
-    setInstallations(installations.map(inst => 
-      inst.id === updatedInstallation.id ? updatedInstallation : inst));
+    setInstallations((prev) =>
+      prev.map((inst) => (inst.id === updatedInstallation.id ? updatedInstallation : inst))
+    );
   };
-  
+
+  if (!authToken) {
+    return (
+      <div className="auth-screen">
+        <Login onSuccess={handleLoginSuccess} />
+      </div>
+    );
+  }
+
   if (loading) {
     return (
       <div className="loading-container">
@@ -84,7 +149,7 @@ function App() {
     return (
       <div className="error-container">
         <h2>⚠️ Error</h2>
-        <p>{error.message}</p>
+        <p>{error.message || 'Something went wrong while loading installations.'}</p>
       </div>
     );
   }
@@ -97,15 +162,27 @@ function App() {
             <h1>🏠 Installation Tracker</h1>
             <p className="subtitle">Manage and track your installations</p>
           </div>
-          <button
-            type="button"
-            className="theme-toggle-button"
-            onClick={toggleTheme}
-            aria-label={`Switch to ${isDarkTheme ? 'light' : 'dark'} mode`}
-          >
-            <span className="theme-toggle-icon">{isDarkTheme ? '☀️' : '🌙'}</span>
-            {isDarkTheme ? 'Light Mode' : 'Dark Mode'}
-          </button>
+          <div className="header-actions">
+            {currentUser && (
+              <p className="user-info">Signed in as <span className="username">{currentUser.username}</span></p>
+            )}
+            <button
+              type="button"
+              className="theme-toggle-button"
+              onClick={toggleTheme}
+              aria-label={`Switch to ${isDarkTheme ? 'light' : 'dark'} mode`}
+            >
+              <span className="theme-toggle-icon">{isDarkTheme ? '☀️' : '🌙'}</span>
+              {isDarkTheme ? 'Light Mode' : 'Dark Mode'}
+            </button>
+            <button
+              type="button"
+              className="theme-toggle-button sign-out-button"
+              onClick={handleLogout}
+            >
+              🚪 Sign Out
+            </button>
+          </div>
         </div>
       </header>
 
