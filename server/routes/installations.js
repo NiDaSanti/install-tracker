@@ -19,6 +19,7 @@ async function readInstallations() {
     return JSON.parse(data);
   } catch (err) {
     if (err.code === 'ENOENT') {
+      await fs.mkdir(path.dirname(DATA_FILE), { recursive: true });
       await fs.writeFile(DATA_FILE, JSON.stringify([], null, 2));
       return [];
     }
