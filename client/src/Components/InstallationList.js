@@ -1,5 +1,6 @@
-import React, {useState} from "react";
-import apiClient from "../apiClient";
+import React, { useState } from 'react';
+import apiClient from '../apiClient';
+import { EditIcon, TrashIcon, ListIcon } from '../Icons';
 
 // Display all Installations
 function InstallationList({ installations, onDelete, onUpdate }) {
@@ -58,13 +59,21 @@ function InstallationList({ installations, onDelete, onUpdate }) {
   };
 
   return (
-    /* Make a table to show all installations */
-    <>
-      <h2>Installations</h2>
+    <section className="data-section">
+      <div className="section-heading">
+        <div className="section-heading-icon" aria-hidden="true">
+          <ListIcon size={20} />
+        </div>
+        <div>
+          <h2>Installation Records</h2>
+          <p className="section-subtitle">{installations.length} active installation{installations.length === 1 ? '' : 's'} tracked</p>
+        </div>
+      </div>
       {installations.length === 0 ? (
-        <p>No Installations</p>
+        <p className="empty-state">No installations have been added yet.</p>
       ) : (
-        <table>
+        <div className="table-wrapper">
+          <table className="records-table">
           <thead>
             <tr>
               <th>Homeowner Name</th>
@@ -135,8 +144,20 @@ function InstallationList({ installations, onDelete, onUpdate }) {
                       />
                     </td>
                     <td data-label="Actions">
-                      <button onClick={() => handleSave(installation.id)}>Save</button>
-                      <button onClick={handleCancel}>Cancel</button>
+                      <button
+                        type="button"
+                        className="table-action table-action--primary"
+                        onClick={() => handleSave(installation.id)}
+                      >
+                        Save
+                      </button>
+                      <button
+                        type="button"
+                        className="table-action table-action--neutral"
+                        onClick={handleCancel}
+                      >
+                        Cancel
+                      </button>
                     </td>
                   </>
                 ) : (
@@ -151,17 +172,32 @@ function InstallationList({ installations, onDelete, onUpdate }) {
                     <td data-label="Install Date">{installation.installDate}</td>
                     <td data-label="Notes">{installation.notes || '—'}</td>
                     <td data-label="Actions">
-                      <button onClick={() => handleEdit(installation)}>Edit</button>
-                      <button onClick={() => handleDelete(installation.id)}>Delete</button>
+                      <button
+                        type="button"
+                        className="table-action table-action--primary"
+                        onClick={() => handleEdit(installation)}
+                      >
+                        <EditIcon size={16} className="table-action-icon" aria-hidden="true" />
+                        <span>Edit</span>
+                      </button>
+                      <button
+                        type="button"
+                        className="table-action table-action--danger"
+                        onClick={() => handleDelete(installation.id)}
+                      >
+                        <TrashIcon size={16} className="table-action-icon" aria-hidden="true" />
+                        <span>Delete</span>
+                      </button>
                     </td>
                   </>
                 )}
               </tr>
             ))}
-          </tbody> 
-        </table>
+          </tbody>
+          </table>
+        </div>
       )}
-    </>
+    </section>
   );
 };
 

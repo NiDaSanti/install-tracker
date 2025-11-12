@@ -2,6 +2,7 @@ import React, {useEffect, useMemo, useState} from 'react';
 import {MapContainer, TileLayer, Marker, Popup} from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+import { LocationIcon, PowerIcon, CalendarIcon, NoteIcon } from '../Icons';
 
 const STADIA_API_KEY = process.env.REACT_APP_STADIA_API_KEY;
 const STAMEN_TONER_URL_BASE = 'https://tiles.stadiamaps.com/tiles/stamen_toner/{z}/{x}/{y}{r}.png';
@@ -153,13 +154,21 @@ const InstallationMap = ({ installations, theme = 'light' }) => {
               <Popup className="custom-popup">
                 <div className="popup-content">
                   <div className="popup-header">
-                    <div className="popup-icon">☀️</div>
-                    <h3>{installation.homeownerName}</h3>
+                    <div className="popup-icon" aria-hidden="true">
+                      <PowerIcon size={20} />
+                    </div>
+                    <div className="popup-title">
+                      <h3>{installation.homeownerName}</h3>
+                      <p className="popup-subtitle">{installation.systemSize} system</p>
+                    </div>
                   </div>
                   
                   <div className="popup-body">
                     <div className="popup-section">
-                      <div className="popup-label">📍 Location</div>
+                      <div className="popup-label">
+                        <LocationIcon size={16} className="popup-label-icon" />
+                        <span>Location</span>
+                      </div>
                       <div className="popup-value">
                         {installation.address}<br/>
                         {installation.city}, {installation.state} {installation.zip}
@@ -167,12 +176,18 @@ const InstallationMap = ({ installations, theme = 'light' }) => {
                     </div>
                     
                     <div className="popup-section">
-                      <div className="popup-label">⚡ System Size</div>
+                      <div className="popup-label">
+                        <PowerIcon size={16} className="popup-label-icon" />
+                        <span>System Size</span>
+                      </div>
                       <div className="popup-value">{installation.systemSize}</div>
                     </div>
                     
                     <div className="popup-section">
-                      <div className="popup-label">📅 Install Date</div>
+                      <div className="popup-label">
+                        <CalendarIcon size={16} className="popup-label-icon" />
+                        <span>Install Date</span>
+                      </div>
                       <div className="popup-value">
                         {new Date(installation.installDate).toLocaleDateString('en-US', {
                           year: 'numeric',
@@ -184,7 +199,10 @@ const InstallationMap = ({ installations, theme = 'light' }) => {
                     
                     {installation.notes && (
                       <div className="popup-section">
-                        <div className="popup-label">📝 Notes</div>
+                        <div className="popup-label">
+                          <NoteIcon size={16} className="popup-label-icon" />
+                          <span>Notes</span>
+                        </div>
                         <div className="popup-value">{installation.notes}</div>
                       </div>
                     )}
