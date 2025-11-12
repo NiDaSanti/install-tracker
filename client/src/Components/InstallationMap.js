@@ -3,6 +3,12 @@ import {MapContainer, TileLayer, Marker, Popup} from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
+const STADIA_API_KEY = process.env.REACT_APP_STADIA_API_KEY;
+const STAMEN_TONER_URL_BASE = 'https://tiles.stadiamaps.com/tiles/stamen_toner/{z}/{x}/{y}{r}.png';
+const stamenTonerUrl = STADIA_API_KEY
+  ? `${STAMEN_TONER_URL_BASE}?api_key=${STADIA_API_KEY}`
+  : STAMEN_TONER_URL_BASE;
+
 const TILE_STYLE_LIBRARY = {
   cartoPositron: {
     label: 'Carto Positron (Clean Light)',
@@ -19,11 +25,14 @@ const TILE_STYLE_LIBRARY = {
     maxZoom: 20
   },
   stamenToner: {
-    label: 'Stamen Toner (Blueprint)',
-    url: 'https://stamen-tiles.a.ssl.fastly.net/toner/{z}/{x}/{y}.png',
-    attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors.',
+    label: STADIA_API_KEY
+      ? 'Stamen Toner (Blueprint)'
+      : 'Stamen Toner (Blueprint - Stadia API key required)',
+    url: stamenTonerUrl,
+    attribution: 'Map tiles by <a href="https://stadiamaps.com/">Stadia Maps</a> & Stamen Design, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors.',
     subdomains: 'abcd',
-    maxZoom: 20
+    maxZoom: 20,
+    requiresApiKey: true
   }
 };
 
@@ -79,7 +88,16 @@ const InstallationMap = ({ installations, theme = 'light' }) => {
   }, [theme]);
 
   const tileStyle = useMemo(() => {
-    return TILE_STYLE_LIBRARY[styleKey] ?? TILE_STYLE_LIBRARY.cartoPositron;
+    const selectedStyle = TILE_STYLE_LIBRARY[styleKey];
+    if (!selectedStyle) {
+      return TILE_STYLE_LIBRARY.cartoPositron;
+    }
+
+    if (selectedStyle.requiresApiKey && !STADIA_API_KEY) {
+      return TILE_STYLE_LIBRARY.cartoPositron;
+    }
+
+    return selectedStyle;
   }, [styleKey]);
 
   return (
@@ -93,13 +111,21 @@ const InstallationMap = ({ installations, theme = 'light' }) => {
             value={styleKey}
             onChange={(event) => setStyleKey(event.target.value)}
           >
-            {Object.entries(TILE_STYLE_LIBRARY).map(([key, style]) => (
-              <option key={key} value={key}>
-                {style.label}
-              </option>
-            ))}
+            {Object.entries(TILE_STYLE_LIBRARY).map(([key, style]) => {
+              const optionDisabled = Boolean(style.requiresApiKey && !STADIA_API_KEY);
+              return (
+                <option key={key} value={key} disabled={optionDisabled}>
+                  {style.label}
+                </option>
+              );
+            })}
           </select>
         </label>
+        {!STADIA_API_KEY && (
+          <div className="map-style-hint">
+            Add <code>REACT_APP_STADIA_API_KEY</code> to enable the blueprint layer.
+          </div>
+        )}
       </div>
       <MapContainer
         center={defaultCenter}
