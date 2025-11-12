@@ -46,6 +46,10 @@ function App() {
       setInstallations(response.data);
       setError(null);
     } catch (err) {
+      if (err?.response?.status === 401) {
+        setError(null);
+        return;
+      }
       setError(err);
     } finally {
       setLoading(false);
