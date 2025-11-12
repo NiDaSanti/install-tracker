@@ -330,6 +330,11 @@ body {
   box-shadow: 0 10px 20px rgba(242, 95, 140, 0.18);
 }
 
+.table-cell--readonly {
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
 .command-center {
   display: flex;
   flex-direction: column;
@@ -392,6 +397,11 @@ body {
   color: var(--color-heading);
 }
 
+.metric-value--compact {
+  font-size: 1.35rem;
+  line-height: 1.4;
+}
+
 .metric-subtext {
   font-size: 0.85rem;
   color: var(--color-text-muted);
@@ -427,6 +437,7 @@ body {
   overflow: hidden;
   box-shadow: var(--shadow-soft);
   min-height: 520px;
+  background: var(--color-card);
 }
 
 .command-panel--map .map-style-toolbar {
@@ -589,6 +600,49 @@ body {
 
 .activity-separator {
   opacity: 0.5;
+}
+
+.utility-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.utility-list li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.utility-swatch {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+}
+
+.utility-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.utility-name {
+  font-weight: 600;
+  color: var(--color-heading);
+}
+
+.utility-metrics {
+  font-size: 0.84rem;
+  color: var(--color-text-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.utility-divider {
+  opacity: 0.6;
 }
 
 .app-container {
@@ -878,6 +932,39 @@ body {
   box-shadow: 0 4px 12px rgba(12, 40, 78, 0.08);
   position: relative;
   z-index: 10;
+}
+
+.utility-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 18px;
+  padding: 14px 22px 0;
+  background: var(--color-surface);
+  border-left: 1px solid var(--color-border);
+  border-right: 1px solid var(--color-border);
+}
+
+.utility-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.utility-legend-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.12);
+}
+
+.utility-legend-label {
+  font-weight: 600;
+  color: var(--color-heading);
+  letter-spacing: 0.4px;
 }
 
 .map-frame {
@@ -1425,6 +1512,16 @@ h2 {
     display: flex;
     align-items: center;
     gap: 8px;
+  }
+
+  .utility-legend {
+    flex-direction: column;
+    padding: 12px 16px 0;
+    gap: 10px;
+  }
+
+  .utility-legend-item {
+    font-size: 0.74rem;
   }
 
   .popup-body {

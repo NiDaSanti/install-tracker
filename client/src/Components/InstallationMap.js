@@ -2,7 +2,7 @@ import React, {useEffect, useMemo, useState} from 'react';
 import {MapContainer, TileLayer, Marker, Popup} from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
-import { LocationIcon, PowerIcon, CalendarIcon, NoteIcon } from '../Icons';
+import { LocationIcon, PowerIcon, CalendarIcon, NoteIcon, MapIcon } from '../Icons';
 
 const STADIA_API_KEY = process.env.REACT_APP_STADIA_API_KEY;
 const STAMEN_TONER_URL_BASE = 'https://tiles.stadiamaps.com/tiles/stamen_toner/{z}/{x}/{y}{r}.png';
@@ -37,47 +37,69 @@ const TILE_STYLE_LIBRARY = {
   }
 };
 
-// Create a beautiful custom icon with solar panel theme
-const createCustomIcon = () => {
-  const svgIcon = `
+const iconCache = new Map();
+
+const normalizeHex = (color) => {
+  if (!color || typeof color !== 'string') {
+    return '#00bff0';
+  }
+  const hex = color.trim();
+  if (/^#([0-9a-fA-F]{3})$/.test(hex)) {
+    return `#${hex[1]}${hex[1]}${hex[2]}${hex[2]}${hex[3]}${hex[3]}`;
+  }
+  if (/^#([0-9a-fA-F]{6})$/.test(hex)) {
+    return hex;
+  }
+  return '#00bff0';
+};
+
+const lightenHex = (hexColor, amount = 0.3) => {
+  const hex = normalizeHex(hexColor).replace('#', '');
+  const r = parseInt(hex.substring(0, 2), 16);
+  const g = parseInt(hex.substring(2, 4), 16);
+  const b = parseInt(hex.substring(4, 6), 16);
+
+  const mix = (component) => Math.round(component + (255 - component) * amount);
+
+  const toHex = (component) => component.toString(16).padStart(2, '0');
+
+  return `#${toHex(mix(r))}${toHex(mix(g))}${toHex(mix(b))}`;
+};
+
+const createMarkerSvg = (accentColor) => {
+  const lightColor = lightenHex(accentColor, 0.45);
+  return `
     <svg width="34" height="34" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-      <!-- Shadow circle -->
-      <circle cx="20" cy="20" r="18" fill="#2c3e50" opacity="0.2"/>
-      
-      <!-- Main circle background (neon gradient) -->
-      <circle cx="20" cy="20" r="16" fill="url(#gradient)" stroke="#071826" stroke-width="1.5"/>
-      
-      <!-- Gradient definition -->
-      <defs>
-        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" style="stop-color:#00e5ff;stop-opacity:1" />
-          <stop offset="100%" style="stop-color:#8a2be2;stop-opacity:1" />
-        </linearGradient>
-      </defs>
-      
-      <!-- Solar panel icon -->
+      <circle cx="20" cy="20" r="18" fill="rgba(12, 40, 78, 0.22)" />
+      <circle cx="20" cy="20" r="16" fill="${lightColor}" stroke="${accentColor}" stroke-width="2" />
       <g transform="translate(20, 20)">
-        <!-- Panel grid -->
-        <rect x="-6" y="-6" width="12" height="12" fill="#071826" opacity="0.9" rx="1"/>
-        <line x1="-6" y1="0" x2="6" y2="0" stroke="#00e5ff" stroke-width="0.5" opacity="0.6"/>
-        <line x1="0" y1="-6" x2="0" y2="6" stroke="#00e5ff" stroke-width="0.5" opacity="0.6"/>
-        
-        <!-- Small sun dot -->
-        <circle cx="0" cy="-8" r="1" fill="#ffd166" opacity="0.95"/>
+        <rect x="-6" y="-6" width="12" height="12" fill="rgba(7, 24, 38, 0.92)" rx="1.4" />
+        <line x1="-6" y1="0" x2="6" y2="0" stroke="${accentColor}" stroke-width="0.6" opacity="0.7" />
+        <line x1="0" y1="-6" x2="0" y2="6" stroke="${accentColor}" stroke-width="0.6" opacity="0.7" />
+        <circle cx="0" cy="-7.6" r="1.2" fill="${accentColor}" />
       </g>
     </svg>
   `;
-  
-  return L.divIcon({
+};
+
+const getCustomIcon = (accentColor) => {
+  const color = normalizeHex(accentColor);
+  if (iconCache.has(color)) {
+    return iconCache.get(color);
+  }
+
+  const svgIcon = createMarkerSvg(color);
+  const icon = L.divIcon({
     html: svgIcon,
     className: 'custom-marker-icon',
     iconSize: [34, 34],
     iconAnchor: [17, 17],
     popupAnchor: [0, -18]
   });
-};
 
-const customIcon = createCustomIcon();
+  iconCache.set(color, icon);
+  return icon;
+};
 
 const InstallationMap = ({ installations, theme = 'light' }) => {
   const defaultCenter = [34.0522, -118.2437]; // Default to Los Angeles
@@ -100,6 +122,17 @@ const InstallationMap = ({ installations, theme = 'light' }) => {
 
     return selectedStyle;
   }, [styleKey]);
+
+  const utilityLegendItems = useMemo(() => {
+    const territoryMap = new Map();
+    installations.forEach((inst) => {
+      const territory = inst.utilityTerritory;
+      if (territory?.code && !territoryMap.has(territory.code)) {
+        territoryMap.set(territory.code, territory);
+      }
+    });
+    return Array.from(territoryMap.values());
+  }, [installations]);
 
   return (
     <div className="map-wrapper">
@@ -128,6 +161,20 @@ const InstallationMap = ({ installations, theme = 'light' }) => {
           </div>
         )}
       </div>
+      {utilityLegendItems.length > 0 && (
+        <div className="utility-legend">
+          {utilityLegendItems.map((territory) => (
+            <span className="utility-legend-item" key={territory.code}>
+              <span
+                className="utility-legend-swatch"
+                style={{ backgroundColor: territory.color }}
+                aria-hidden="true"
+              />
+              <span className="utility-legend-label">{territory.name}</span>
+            </span>
+          ))}
+        </div>
+      )}
       <MapContainer
         center={defaultCenter}
         zoom={defaultZoom}
@@ -149,7 +196,7 @@ const InstallationMap = ({ installations, theme = 'light' }) => {
             <Marker
               key={installation.id}
               position={[installation.latitude, installation.longitude]}
-              icon={customIcon}
+              icon={getCustomIcon(installation.utilityTerritory?.color)}
             >
               <Popup className="custom-popup">
                 <div className="popup-content">
@@ -174,6 +221,16 @@ const InstallationMap = ({ installations, theme = 'light' }) => {
                         {installation.city}, {installation.state} {installation.zip}
                       </div>
                     </div>
+
+                    {installation.utilityTerritory && (
+                      <div className="popup-section">
+                        <div className="popup-label">
+                          <MapIcon size={16} className="popup-label-icon" />
+                          <span>Utility Territory</span>
+                        </div>
+                        <div className="popup-value">{installation.utilityTerritory.name}</div>
+                      </div>
+                    )}
                     
                     <div className="popup-section">
                       <div className="popup-label">

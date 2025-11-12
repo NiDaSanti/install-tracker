@@ -20,6 +20,7 @@ import {
   NoteIcon
 } from './Icons';
 import { getToken, setToken as storeToken, clearToken as eraseToken } from './auth';
+import { resolveUtilityTerritory } from './utils/utilityTerritories';
 
 function App() {
   const [installations, setInstallations] = useState([]);
@@ -180,6 +181,15 @@ function App() {
     );
   };
 
+  const installationsWithTerritory = useMemo(
+    () =>
+      installations.map((installation) => ({
+        ...installation,
+        utilityTerritory: resolveUtilityTerritory(installation)
+      })),
+    [installations]
+  );
+
   const analytics = useMemo(() => {
     const toNumeric = (value) => {
       const numberValue = Number.parseFloat(value);
@@ -194,19 +204,22 @@ function App() {
       return Number.isFinite(time) ? time : 0;
     };
 
-    if (!installations || installations.length === 0) {
+    if (!installationsWithTerritory || installationsWithTerritory.length === 0) {
       return {
         totalInstallations: 0,
         totalCapacity: 0,
         averageSystemSize: 0,
         installationsThisMonth: 0,
         installationsLast30Days: 0,
+        installationsPrevious30Days: 0,
         uniqueStates: 0,
         notesCoverage: 0,
         coordinateCoverage: 0,
         latestInstallation: null,
         recentActivity: [],
-        topStates: []
+        topStates: [],
+        utilityDistribution: [],
+        topUtility: null
       };
     }
 
@@ -217,25 +230,25 @@ function App() {
   const sixtyDaysAgo = new Date(now);
   sixtyDaysAgo.setDate(now.getDate() - 60);
 
-    const sizes = installations.map((inst) => toNumeric(inst.systemSize));
+    const sizes = installationsWithTerritory.map((inst) => toNumeric(inst.systemSize));
     const validSizes = sizes.filter((size) => size > 0);
     const totalCapacity = validSizes.reduce((sum, value) => sum + value, 0);
     const averageSystemSize = validSizes.length > 0 ? totalCapacity / validSizes.length : 0;
 
-    const installationsThisMonth = installations.filter((inst) => toTimestamp(inst.installDate) >= startOfMonth.getTime()).length;
-    const installationsLast30Days = installations.filter((inst) => toTimestamp(inst.installDate) >= thirtyDaysAgo.getTime()).length;
-    const installationsPrevious30Days = installations.filter((inst) => {
+    const installationsThisMonth = installationsWithTerritory.filter((inst) => toTimestamp(inst.installDate) >= startOfMonth.getTime()).length;
+    const installationsLast30Days = installationsWithTerritory.filter((inst) => toTimestamp(inst.installDate) >= thirtyDaysAgo.getTime()).length;
+    const installationsPrevious30Days = installationsWithTerritory.filter((inst) => {
       const timestamp = toTimestamp(inst.installDate);
       return timestamp >= sixtyDaysAgo.getTime() && timestamp < thirtyDaysAgo.getTime();
     }).length;
 
-    const coordinateCoverage = installations.filter(
+    const coordinateCoverage = installationsWithTerritory.filter(
       (inst) => Number.isFinite(Number(inst.latitude)) && Number.isFinite(Number(inst.longitude))
     ).length;
 
-    const notesCoverage = installations.filter((inst) => inst.notes && inst.notes.trim().length > 0).length;
+    const notesCoverage = installationsWithTerritory.filter((inst) => inst.notes && inst.notes.trim().length > 0).length;
 
-    const stateCounts = installations.reduce((acc, inst) => {
+    const stateCounts = installationsWithTerritory.reduce((acc, inst) => {
       const stateKey = inst.state ? inst.state.trim().toUpperCase() : '';
       if (!stateKey) {
         return acc;
@@ -244,7 +257,7 @@ function App() {
       return acc;
     }, {});
 
-    const timelineSorted = [...installations].sort(
+    const timelineSorted = [...installationsWithTerritory].sort(
       (a, b) => toTimestamp(b.installDate) - toTimestamp(a.installDate)
     );
 
@@ -257,11 +270,35 @@ function App() {
       .map(([state, count]) => ({
         state,
         count,
-        share: count / installations.length
+        share: count / installationsWithTerritory.length
       }));
 
+    const utilityCounts = installationsWithTerritory.reduce((acc, inst) => {
+      const territory = inst.utilityTerritory;
+      const code = territory?.code || 'UNMAPPED';
+      if (!acc[code]) {
+        acc[code] = {
+          code,
+          name: territory?.name || 'Unmapped Utility',
+          color: territory?.color || '#8a9fb2',
+          count: 0
+        };
+      }
+      acc[code].count += 1;
+      return acc;
+    }, {});
+
+    const utilityDistribution = Object.values(utilityCounts)
+      .sort((a, b) => b.count - a.count)
+      .map((entry) => ({
+        ...entry,
+        share: entry.count / installationsWithTerritory.length
+      }));
+
+    const topUtility = utilityDistribution[0] || null;
+
     return {
-      totalInstallations: installations.length,
+      totalInstallations: installationsWithTerritory.length,
       totalCapacity,
       averageSystemSize,
       installationsThisMonth,
@@ -272,9 +309,11 @@ function App() {
       coordinateCoverage,
       latestInstallation,
       recentActivity,
-      topStates
+      topStates,
+      utilityDistribution,
+      topUtility
     };
-  }, [installations]);
+  }, [installationsWithTerritory]);
 
   const formatKw = (value) =>
     `${Number(value || 0).toLocaleString(undefined, { maximumFractionDigits: 1 })} kW`;
@@ -445,6 +484,21 @@ function App() {
                 <div className="metric-value">{formatPercent(geocodedCoveragePercent)}</div>
                 <p className="metric-subtext">{formatNumber(analytics.uniqueStates)} active regions</p>
               </article>
+
+              <article className="metric-card">
+                <div className="metric-card-header">
+                  <MapIcon size={18} className="metric-icon" />
+                  <span className="metric-label">Top Utility Territory</span>
+                </div>
+                <div className="metric-value metric-value--compact">
+                  {analytics.topUtility ? analytics.topUtility.name : '—'}
+                </div>
+                <p className="metric-subtext">
+                  {analytics.topUtility
+                    ? `${formatPercent(analytics.topUtility.share * 100)} of portfolio`
+                    : 'Utility mapping updates live'}
+                </p>
+              </article>
             </div>
           </section>
 
@@ -458,7 +512,7 @@ function App() {
                 <span className="panel-meta">{formatNumber(analytics.totalInstallations)} records</span>
               </div>
               <InstallationList
-                installations={installations}
+                installations={installationsWithTerritory}
                 onDelete={handleInstallationDeleted}
                 onUpdate={handleInstallationUpdated}
               />
@@ -472,7 +526,7 @@ function App() {
                 </div>
                 <span className="panel-meta">{formatPercent(geocodedCoveragePercent)} mapped</span>
               </div>
-              <InstallationMap installations={installations} theme={theme} />
+              <InstallationMap installations={installationsWithTerritory} theme={theme} />
             </section>
 
             <section className="command-panel command-panel--form">
@@ -567,6 +621,33 @@ function App() {
                     <p className="insight-empty">Log an installation to build mission history.</p>
                   )}
                 </article>
+
+                <article className="insight-card">
+                  <h4>Utility Territories</h4>
+                  {analytics.utilityDistribution.length > 0 ? (
+                    <ul className="utility-list">
+                      {analytics.utilityDistribution.map((entry) => (
+                        <li key={entry.code}>
+                          <span
+                            className="utility-swatch"
+                            style={{ backgroundColor: entry.color }}
+                            aria-hidden="true"
+                          />
+                          <div className="utility-details">
+                            <span className="utility-name">{entry.name}</span>
+                            <span className="utility-metrics">
+                              {formatNumber(entry.count)} installs
+                              <span className="utility-divider">•</span>
+                              {formatPercent(entry.share * 100)} coverage
+                            </span>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="insight-empty">Utility overlays populate as installs are mapped.</p>
+                  )}
+                </article>
               </div>
             </section>
           </div>
@@ -607,7 +688,7 @@ function App() {
             {activeTab === 'list' && (
               <div className="tab-panel">
                 <InstallationList
-                  installations={installations}
+                  installations={installationsWithTerritory}
                   onDelete={handleInstallationDeleted}
                   onUpdate={handleInstallationUpdated}
                 />
@@ -616,7 +697,7 @@ function App() {
 
             {activeTab === 'map' && (
               <div className="tab-panel map-panel">
-                <InstallationMap installations={installations} theme={theme} />
+                <InstallationMap installations={installationsWithTerritory} theme={theme} />
               </div>
             )}
           </div>

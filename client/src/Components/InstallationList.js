@@ -80,6 +80,7 @@ function InstallationList({ installations, onDelete, onUpdate }) {
               <th>Address</th>
               <th>City</th>
               <th>State</th>
+              <th>Utility</th>
               <th>Zip</th>
               <th>System Size</th>
               <th>Install Date</th>
@@ -116,6 +117,9 @@ function InstallationList({ installations, onDelete, onUpdate }) {
                         value={editForm.state}
                         onChange={(e) => handleFieldChange('state', e.target.value)}
                       />
+                    </td>
+                    <td data-label="Utility" className="table-cell--readonly">
+                      {installation.utilityTerritory?.name || '—'}
                     </td>
                     <td data-label="Zip">
                       <input
@@ -167,6 +171,7 @@ function InstallationList({ installations, onDelete, onUpdate }) {
                     <td data-label="Address">{installation.address}</td>
                     <td data-label="City">{installation.city}</td>
                     <td data-label="State">{installation.state}</td>
+                    <td data-label="Utility">{installation.utilityTerritory?.name || '—'}</td>
                     <td data-label="Zip">{installation.zip}</td>
                     <td data-label="System Size">{installation.systemSize} kW</td>
                     <td data-label="Install Date">{installation.installDate}</td>
