@@ -130,7 +130,7 @@ const InstallationMap = ({ installations, theme = 'light' }) => {
       <MapContainer
         center={defaultCenter}
         zoom={defaultZoom}
-        style={{ height: '100%', width: '100%' }}
+        className="map-frame"
       >
         {/* Dynamic map tiles */}
         <TileLayer
