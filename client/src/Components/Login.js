@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import apiClient from '../apiClient';
+import { LogoIcon } from '../Icons';
 
 function Login({ onSuccess }) {
   const [username, setUsername] = useState('');
@@ -30,8 +31,11 @@ function Login({ onSuccess }) {
   return (
     <div className="auth-container">
       <div className="auth-card">
-        <h1>🔐 Installation Tracker</h1>
-        <p className="auth-subtitle">Sign in with the credentials provided to you.</p>
+        <div className="auth-logo" aria-hidden="true">
+          <LogoIcon size={42} />
+        </div>
+        <h1>Installation Tracker</h1>
+        <p className="auth-subtitle">Secure workspace for field operations teams.</p>
         <form className="auth-form" onSubmit={handleSubmit}>
           <label htmlFor="username">Username</label>
           <input

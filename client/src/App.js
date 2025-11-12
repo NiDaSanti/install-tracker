@@ -5,6 +5,16 @@ import InstallationList from './Components/InstallationList';
 import InstallationForm from './Components/InstallationForm';
 import InstallationMap from './Components/InstallationMap';
 import Login from './Components/Login';
+import {
+  LogoIcon,
+  SunIcon,
+  MoonIcon,
+  LogoutIcon,
+  AddIcon,
+  ListIcon,
+  MapIcon,
+  WarningIcon
+} from './Icons';
 import { getToken, setToken as storeToken, clearToken as eraseToken } from './auth';
 
 function App() {
@@ -152,8 +162,9 @@ function App() {
   if (error) {
     return (
       <div className="error-container">
-        <h2>⚠️ Error</h2>
-        <p>{error.message || 'Something went wrong while loading installations.'}</p>
+        <WarningIcon className="status-icon" size={68} />
+        <h2>Something went wrong</h2>
+        <p>{error.message || 'We were unable to load your installations. Please try again.'}</p>
       </div>
     );
   }
@@ -163,12 +174,21 @@ function App() {
       <header className="app-header">
         <div className="header-top">
           <div className="header-main">
-            <h1>🏠 Installation Tracker</h1>
-            <p className="subtitle">Manage and track your installations</p>
+            <div className="app-title">
+              <LogoIcon size={34} className="app-title-icon" />
+              <div className="app-title-text">
+                <h1>Installation Tracker</h1>
+                <p className="subtitle">Operational visibility for every install</p>
+              </div>
+            </div>
           </div>
           <div className="header-actions">
             {currentUser && (
-              <p className="user-info">Signed in as <span className="username">{currentUser.username}</span></p>
+              <p className="user-info">
+                <span className="user-indicator" aria-hidden="true" />
+                <span>Signed in as </span>
+                <span className="username">{currentUser.username}</span>
+              </p>
             )}
             <button
               type="button"
@@ -176,15 +196,20 @@ function App() {
               onClick={toggleTheme}
               aria-label={`Switch to ${isDarkTheme ? 'light' : 'dark'} mode`}
             >
-              <span className="theme-toggle-icon">{isDarkTheme ? '☀️' : '🌙'}</span>
-              {isDarkTheme ? 'Light Mode' : 'Dark Mode'}
+              {isDarkTheme ? (
+                <SunIcon className="button-icon" size={18} />
+              ) : (
+                <MoonIcon className="button-icon" size={18} />
+              )}
+              <span>{isDarkTheme ? 'Light Mode' : 'Dark Mode'}</span>
             </button>
             <button
               type="button"
               className="theme-toggle-button sign-out-button"
               onClick={handleLogout}
             >
-              🚪 Sign Out
+              <LogoutIcon className="button-icon" size={18} />
+              <span>Sign Out</span>
             </button>
           </div>
         </div>
@@ -196,19 +221,22 @@ function App() {
             className={`tab ${activeTab === 'form' ? 'active' : ''}`}
             onClick={() => setActiveTab('form')}
           >
-            ➕ Add Installation
+            <AddIcon className="tab-icon" size={18} />
+            <span className="tab-label">New Installation</span>
           </button>
           <button 
             className={`tab ${activeTab === 'list' ? 'active' : ''}`}
             onClick={() => setActiveTab('list')}
           >
-            📋 Installations List ({installations.length})
+            <ListIcon className="tab-icon" size={18} />
+            <span className="tab-label">Installation Log ({installations.length})</span>
           </button>
           <button 
             className={`tab ${activeTab === 'map' ? 'active' : ''}`}
             onClick={() => setActiveTab('map')}
           >
-            🗺️ Map View
+            <MapIcon className="tab-icon" size={18} />
+            <span className="tab-label">Map Overview</span>
           </button>
         </div>
 
