@@ -342,6 +342,7 @@ function App() {
     maximumFractionDigits: 1
   });
   const installations30DayDelta = analytics.installationsLast30Days - (analytics.installationsPrevious30Days || 0);
+  const currentYear = new Date().getFullYear();
 
   if (!authToken) {
     return (
@@ -371,8 +372,9 @@ function App() {
   }
 
   return (
-    <div className="app-container">
-      <header className="app-header">
+    <div className="app-shell">
+      <div className="app-container" id="top">
+        <header className="app-header">
         <div className="header-top">
           <div className="header-main">
             <div className="app-title">
@@ -416,7 +418,7 @@ function App() {
         </div>
       </header>
 
-      {isDesktop ? (
+        {isDesktop ? (
         <div className="command-center">
           <section className="data-section command-overview">
             <div className="section-heading">
@@ -652,9 +654,9 @@ function App() {
               </div>
             </section>
           </div>
-        </div>
-      ) : (
-        <div className="tabs-container">
+          </div>
+        ) : (
+          <div className="tabs-container">
           <div className="tabs">
             <button
               className={`tab ${activeTab === 'form' ? 'active' : ''}`}
@@ -701,9 +703,28 @@ function App() {
                 <InstallationMap installations={installationsWithTerritory} theme={theme} />
               </div>
             )}
+            </div>
+          </div>
+        )}
+      </div>
+      <footer className="app-footer">
+        <div className="app-footer-inner">
+          <div className="app-footer-brand">
+            <LogoIcon size={32} className="app-footer-logo" aria-hidden="true" />
+            <div className="app-footer-text">
+              <span className="app-footer-title">Solar Command</span>
+              <span className="app-footer-subtitle">Precision insight for every install</span>
+            </div>
+          </div>
+          <div className="app-footer-meta">
+            <span className="app-footer-badge">Orbiting since {currentYear}</span>
+            <nav className="app-footer-nav" aria-label="Footer links">
+              <a href="#top" className="app-footer-link">Back to top</a>
+              <a href="mailto:ops@solarcommand.io" className="app-footer-link">ops@solarcommand.io</a>
+            </nav>
           </div>
         </div>
-      )}
+      </footer>
     </div>
   );
 }

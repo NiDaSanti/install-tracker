@@ -116,7 +116,16 @@ body {
   max-width: 420px;
 }
 
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, rgba(2, 12, 24, 0.02), rgba(2, 12, 24, 0.12));
+}
+
 .app-container {
+  flex: 1;
+  width: 100%;
   max-width: 1280px;
   margin: 0 auto;
   padding: 20px 22px 32px;
@@ -453,6 +462,303 @@ body {
 .table-cell--readonly {
   font-weight: 600;
   color: var(--color-text-muted);
+}
+
+.records-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  align-items: stretch;
+}
+
+.record-card {
+  position: relative;
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  box-shadow: 0 16px 30px rgba(12, 40, 78, 0.14);
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  text-align: center;
+}
+
+.record-card--editing {
+  border-color: rgba(0, 191, 240, 0.28);
+  box-shadow: 0 18px 36px rgba(0, 191, 240, 0.22);
+}
+
+.record-card-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.record-card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: linear-gradient(140deg, rgba(0, 191, 240, 0.18), rgba(138, 43, 226, 0.16));
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary);
+  box-shadow: 0 16px 28px rgba(12, 40, 78, 0.18);
+}
+
+.record-card-title-group h3 {
+  margin: 0;
+  font-size: 1.12rem;
+  font-weight: 700;
+  color: var(--color-heading);
+}
+
+.record-card-subtitle {
+  margin: 6px 0 0;
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+  letter-spacing: 0.3px;
+}
+
+.record-card-subtitle-dot {
+  opacity: 0.75;
+}
+
+.record-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.record-card-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(0, 191, 240, 0.12);
+  border: 1px solid rgba(0, 191, 240, 0.18);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  color: var(--color-heading);
+}
+
+.record-card-chip--utility {
+  background: rgba(12, 40, 78, 0.05);
+  border-color: rgba(12, 40, 78, 0.1);
+}
+
+.record-card-chip--muted {
+  background: rgba(12, 40, 78, 0.06);
+  border-color: rgba(12, 40, 78, 0.12);
+  color: var(--color-text-muted);
+}
+
+.record-card-chip-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px rgba(12, 40, 78, 0.12);
+}
+
+.record-card-details {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.record-card-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.record-card-detail dt {
+  font-size: 0.75rem;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.record-card-detail dd {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--color-text);
+  word-break: break-word;
+}
+
+.record-card-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--color-border);
+}
+
+.record-card-id {
+  font-size: 0.72rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.record-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.record-card-actions .table-action {
+  min-width: 130px;
+  justify-content: center;
+}
+
+.record-card-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.record-card-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+}
+
+.record-card-field-group label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--color-text-muted);
+}
+
+.record-card-field-row {
+  display: flex;
+  gap: 12px;
+}
+
+.record-card-field-group--short {
+  flex: 0 0 82px;
+}
+
+.record-card-field-group--zip {
+  flex: 0 0 120px;
+}
+
+.app-footer {
+  padding: 28px 22px 36px;
+  background: radial-gradient(circle at top, rgba(0, 191, 240, 0.18), transparent 45%),
+    linear-gradient(180deg, rgba(7, 22, 38, 0.85), rgba(3, 10, 16, 0.92));
+  color: #f8fbff;
+}
+
+.app-footer-inner {
+  max-width: 1180px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+}
+
+.app-footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.app-footer-logo {
+  padding: 10px;
+  border-radius: 14px;
+  background: linear-gradient(140deg, rgba(0, 191, 240, 0.32), rgba(138, 43, 226, 0.28));
+  box-shadow: 0 18px 36px rgba(2, 8, 20, 0.35);
+}
+
+.app-footer-text {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.app-footer-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.12rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.app-footer-subtitle {
+  font-size: 0.82rem;
+  color: rgba(245, 251, 255, 0.75);
+  letter-spacing: 0.6px;
+}
+
+.app-footer-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+.app-footer-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(122, 206, 255, 0.28);
+  background: rgba(122, 206, 255, 0.14);
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.68rem;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+}
+
+.app-footer-nav {
+  display: inline-flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.app-footer-link {
+  font-size: 0.84rem;
+  color: rgba(245, 251, 255, 0.82);
+  text-decoration: none;
+  position: relative;
+  transition: color var(--transition-fast);
+}
+
+.app-footer-link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 100%;
+  height: 2px;
+  background: rgba(122, 206, 255, 0.8);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--transition-fast);
+}
+
+.app-footer-link:hover,
+.app-footer-link:focus,
+.app-footer-link:focus-visible {
+  color: #fdfefe;
+}
+
+.app-footer-link:hover::after,
+.app-footer-link:focus::after,
+.app-footer-link:focus-visible::after {
+  transform: scaleX(1);
 }
 
 .command-center {
@@ -792,6 +1098,88 @@ body[data-theme='dark'] .utility-dot {
 body[data-theme='dark'] .notes-cell {
   background: rgba(24, 32, 48, 0.68);
   border-color: rgba(74, 168, 255, 0.22);
+  color: var(--color-popup-muted);
+}
+
+body[data-theme='dark'] .app-shell {
+  background: linear-gradient(180deg, rgba(4, 10, 18, 0.85), rgba(3, 8, 14, 0.94));
+}
+
+body[data-theme='dark'] .app-footer {
+  background: radial-gradient(circle at top, rgba(74, 168, 255, 0.22), transparent 45%),
+    linear-gradient(180deg, rgba(5, 18, 34, 0.92), rgba(2, 8, 16, 0.98));
+  color: #f4f9ff;
+}
+
+body[data-theme='dark'] .app-footer-subtitle {
+  color: rgba(222, 238, 255, 0.75);
+}
+
+body[data-theme='dark'] .app-footer-badge {
+  border-color: rgba(74, 168, 255, 0.38);
+  background: rgba(74, 168, 255, 0.16);
+  color: #e8f3ff;
+}
+
+body[data-theme='dark'] .app-footer-link {
+  color: rgba(229, 241, 255, 0.82);
+}
+
+body[data-theme='dark'] .app-footer-link::after {
+  background: rgba(122, 206, 255, 0.9);
+}
+
+body[data-theme='dark'] .record-card {
+  background: linear-gradient(188deg, rgba(25, 32, 48, 0.96), rgba(16, 21, 34, 0.9));
+  border-color: rgba(74, 168, 255, 0.22);
+  box-shadow: 0 20px 42px rgba(0, 0, 0, 0.55);
+}
+
+body[data-theme='dark'] .record-card--editing {
+  border-color: rgba(74, 168, 255, 0.35);
+  box-shadow: 0 22px 46px rgba(74, 168, 255, 0.28);
+}
+
+body[data-theme='dark'] .record-card-icon {
+  background: linear-gradient(150deg, rgba(74, 168, 255, 0.32), rgba(138, 43, 226, 0.26));
+  color: #d9ecff;
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.45);
+}
+
+body[data-theme='dark'] .record-card-chip {
+  background: rgba(74, 168, 255, 0.18);
+  border-color: rgba(74, 168, 255, 0.28);
+  color: #e5f2ff;
+}
+
+body[data-theme='dark'] .record-card-chip--utility {
+  background: rgba(12, 24, 40, 0.86);
+  border-color: rgba(74, 168, 255, 0.28);
+}
+
+body[data-theme='dark'] .record-card-chip--muted {
+  background: rgba(12, 24, 40, 0.7);
+  border-color: rgba(74, 168, 255, 0.18);
+  color: var(--color-popup-muted);
+}
+
+body[data-theme='dark'] .record-card-detail dt {
+  color: var(--color-popup-muted);
+}
+
+body[data-theme='dark'] .record-card-detail dd {
+  color: var(--color-popup);
+}
+
+body[data-theme='dark'] .record-card-footer {
+  border-top-color: rgba(74, 168, 255, 0.2);
+}
+
+body[data-theme='dark'] .record-card-id {
+  color: var(--color-popup-muted);
+}
+
+body[data-theme='dark'] .record-card-field-group label {
   color: var(--color-popup-muted);
 }
 
@@ -1954,22 +2342,29 @@ h2 {
 
   .header-top {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
+    gap: 18px;
   }
 
   .header-actions {
     width: 100%;
-    justify-content: flex-start;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
   }
 
   .tabs {
     padding: 10px 14px;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
   }
 
   .tab {
-    min-width: 200px;
+    min-width: 180px;
     padding: 12px 16px;
-    justify-content: flex-start;
+    justify-content: center;
   }
 
   .tab.active {
@@ -1988,16 +2383,6 @@ h2 {
   button {
     padding: 10px;
     font-size: 0.95rem;
-  }
-
-  table,
-  thead,
-  tbody,
-  th,
-  td,
-  tr {
-    display: block;
-    width: 100%;
   }
 
   .map-panel {
@@ -2043,93 +2428,63 @@ h2 {
     font-size: 0.74rem;
   }
 
-  .popup-body {
+  .table-wrapper {
+    display: none;
+  }
+
+  .records-card-grid {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 16px;
   }
 
-  .popup-section {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .popup-footer {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  thead {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    border: 0;
-  }
-
-  tbody tr {
-    margin-bottom: 20px;
-    background: var(--color-card);
-    border: 1px solid var(--color-border);
-    border-radius: 12px;
-    box-shadow: var(--shadow-medium);
+  .record-card {
     padding: 16px;
+    border-radius: 14px;
   }
 
-  tbody tr:last-child {
-    margin-bottom: 0;
-  }
-
-  tbody td {
-    display: flex;
-    justify-content: space-between;
+  .record-card-details {
     align-items: center;
-    padding: 10px 8px;
-    border-bottom: 1px solid var(--color-border-soft);
-    font-size: 0.95rem;
   }
 
-  tbody td:last-child {
-    border-bottom: none;
-    padding-bottom: 0;
+  .record-card-detail {
+    text-align: center;
   }
 
-  tbody td::before {
-    content: attr(data-label);
-    font-weight: 600;
-    color: var(--color-text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    font-size: 0.65rem;
-    margin-right: 12px;
-    flex: 0 0 45%;
-    display: block;
-  }
-
-  tbody td[data-label="Actions"] {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
-    padding-top: 12px;
-  }
-
-  tbody td[data-label="Actions"]::before {
-    margin-right: 0;
-    margin-bottom: 8px;
-    flex: 0 0 auto;
-  }
-
-  tbody td[data-label="Actions"] button {
+  .record-card-actions {
     width: 100%;
-    margin: 0;
   }
 
-  tbody td[data-label="Actions"] button:last-of-type {
-    margin-bottom: 0;
+  .record-card-actions .table-action {
+    width: 100%;
+  }
+
+  .record-card-field-row {
+    flex-direction: column;
+  }
+
+  .record-card-field-group--short,
+  .record-card-field-group--zip {
+    flex: 1 1 100%;
+  }
+
+  .app-footer {
+    padding: 26px 18px 32px;
+  }
+
+  .app-footer-inner {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 20px;
+  }
+
+  .app-footer-meta {
+    align-items: center;
+  }
+
+  .app-footer-nav {
+    justify-content: center;
   }
 }
 
@@ -2246,5 +2601,53 @@ h2 {
 
   .popup-content {
     font-size: 0.9rem;
+  }
+
+  .records-card-grid {
+    gap: 16px;
+  }
+
+  .record-card {
+    padding: 14px;
+    gap: 14px;
+  }
+
+  .record-card-icon {
+    width: 44px;
+    height: 44px;
+  }
+
+  .record-card-title-group h3 {
+    font-size: 1.04rem;
+  }
+
+  .record-card-chip {
+    font-size: 0.72rem;
+    padding: 5px 9px;
+  }
+
+  .record-card-detail dd {
+    font-size: 0.84rem;
+  }
+
+  .record-card-actions .table-action {
+    font-size: 0.86rem;
+  }
+
+  .app-footer {
+    padding: 24px 16px 28px;
+  }
+
+  .app-footer-title {
+    font-size: 1.02rem;
+  }
+
+  .app-footer-badge {
+    font-size: 0.62rem;
+    letter-spacing: 1.1px;
+  }
+
+  .app-footer-nav {
+    gap: 14px;
   }
 }
