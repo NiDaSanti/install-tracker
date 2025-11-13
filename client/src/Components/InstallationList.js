@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import apiClient from '../apiClient';
 import { EditIcon, TrashIcon, ListIcon } from '../Icons';
+import AnimatedNumber from './AnimatedNumber';
 
 const ANNUAL_OUTPUT_PER_KW = 1350; // Rough annual production estimate per kW capacity.
 
@@ -148,7 +149,10 @@ function InstallationList({ installations, onDelete, onUpdate }) {
         </div>
         <div>
           <h2>Installations</h2>
-          <p className="section-subtitle">Tracking {installations.length} installation{installations.length === 1 ? '' : 's'}</p>
+          <p className="section-subtitle">
+            Tracking <AnimatedNumber value={installations.length} /> installation
+            {installations.length === 1 ? '' : 's'}
+          </p>
         </div>
       </div>
       {installations.length === 0 ? (

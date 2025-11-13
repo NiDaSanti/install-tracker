@@ -5,6 +5,7 @@ import InstallationList from './Components/InstallationList';
 import InstallationForm from './Components/InstallationForm';
 import InstallationMap from './Components/InstallationMap';
 import Login from './Components/Login';
+import AnimatedNumber from './Components/AnimatedNumber';
 import {
   LogoIcon,
   SunIcon,
@@ -379,6 +380,7 @@ function App() {
   const formatKw = (value) =>
     `${Number(value || 0).toLocaleString(undefined, { maximumFractionDigits: 1 })} kW`;
   const formatNumber = (value) => Number(value || 0).toLocaleString();
+  const formatInteger = (value) => formatNumber(Math.round(value || 0));
   const formatPercent = (value) => `${Math.round(value || 0)}%`;
   const formatSystemSizeLabel = (value) => {
     if (value === null || value === undefined || value === '') {
@@ -398,9 +400,6 @@ function App() {
   const notesCoveragePercent = analytics.totalInstallations
     ? Math.round((analytics.notesCoverage / analytics.totalInstallations) * 100)
     : 0;
-  const averageSystemSizeDisplay = Number(analytics.averageSystemSize || 0).toLocaleString(undefined, {
-    maximumFractionDigits: 1
-  });
   const installations30DayDelta = analytics.installationsLast30Days - (analytics.installationsPrevious30Days || 0);
   const currentYear = new Date().getFullYear();
 
@@ -497,7 +496,9 @@ function App() {
                   <ListIcon size={18} className="metric-icon" />
                   <span className="metric-label">Total installs</span>
                 </div>
-                <div className="metric-value">{formatNumber(analytics.totalInstallations)}</div>
+                <div className="metric-value">
+                  <AnimatedNumber value={analytics.totalInstallations} formatter={formatInteger} />
+                </div>
                 <p className="metric-subtext">All recorded jobs</p>
               </article>
 
@@ -506,7 +507,9 @@ function App() {
                   <PowerIcon size={18} className="metric-icon" />
                   <span className="metric-label">Total capacity</span>
                 </div>
-                <div className="metric-value">{formatKw(analytics.totalCapacity)}</div>
+                <div className="metric-value">
+                  <AnimatedNumber value={analytics.totalCapacity} formatter={formatKw} />
+                </div>
                 <p className="metric-subtext">Combined system size</p>
               </article>
 
@@ -515,9 +518,17 @@ function App() {
                   <CalendarIcon size={18} className="metric-icon" />
                   <span className="metric-label">Installs last 30 days</span>
                 </div>
-                <div className="metric-value">{formatNumber(analytics.installationsLast30Days)}</div>
+                <div className="metric-value">
+                  <AnimatedNumber value={analytics.installationsLast30Days} formatter={formatInteger} />
+                </div>
                 <p className="metric-subtext">
-                  {installations30DayDelta >= 0 ? '+' : ''}{formatNumber(installations30DayDelta)} vs previous 30 days
+                  {installations30DayDelta >= 0 ? '+' : '-'}
+                  <AnimatedNumber
+                    value={Math.abs(installations30DayDelta)}
+                    formatter={formatInteger}
+                    duration={1100}
+                  />{' '}
+                  vs previous 30 days
                 </p>
               </article>
 
@@ -526,7 +537,9 @@ function App() {
                   <NoteIcon size={18} className="metric-icon" />
                   <span className="metric-label">Installations with notes</span>
                 </div>
-                <div className="metric-value">{formatPercent(notesCoveragePercent)}</div>
+                <div className="metric-value">
+                  <AnimatedNumber value={notesCoveragePercent} formatter={formatPercent} />
+                </div>
                 <p className="metric-subtext">Jobs that include notes</p>
               </article>
 
@@ -535,7 +548,12 @@ function App() {
                   <PowerIcon size={18} className="metric-icon" />
                   <span className="metric-label">Average system size</span>
                 </div>
-                <div className="metric-value">{averageSystemSizeDisplay} kW</div>
+                <div className="metric-value">
+                  <AnimatedNumber
+                    value={analytics.averageSystemSize}
+                    formatter={formatKw}
+                  />
+                </div>
                 <p className="metric-subtext">Average size across all jobs</p>
               </article>
 
@@ -544,8 +562,12 @@ function App() {
                   <LocationIcon size={18} className="metric-icon" />
                   <span className="metric-label">Installations with map data</span>
                 </div>
-                <div className="metric-value">{formatPercent(geocodedCoveragePercent)}</div>
-                <p className="metric-subtext">{formatNumber(analytics.uniqueStates)} states with installs</p>
+                <div className="metric-value">
+                  <AnimatedNumber value={geocodedCoveragePercent} formatter={formatPercent} />
+                </div>
+                <p className="metric-subtext">
+                  <AnimatedNumber value={analytics.uniqueStates} formatter={formatInteger} /> states with installs
+                </p>
               </article>
 
               <article className="metric-card">
@@ -558,7 +580,15 @@ function App() {
                 </div>
                 <p className="metric-subtext">
                   {analytics.topUtility
-                    ? `${formatPercent(analytics.topUtility.share * 100)} of installs`
+                    ? (
+                      <>
+                        <AnimatedNumber
+                          value={analytics.topUtility.share * 100}
+                          formatter={formatPercent}
+                        />{' '}
+                        of installs
+                      </>
+                    )
                     : 'Utility data appears when available'}
                 </p>
               </article>
@@ -572,7 +602,9 @@ function App() {
                   <h3>Installation list</h3>
                   <p className="panel-subtitle">All installations in one place</p>
                 </div>
-                <span className="panel-meta">{formatNumber(analytics.totalInstallations)} records</span>
+                <span className="panel-meta">
+                  <AnimatedNumber value={analytics.totalInstallations} formatter={formatInteger} /> records
+                </span>
               </div>
               <InstallationList
                 installations={installationsWithTerritory}
@@ -596,7 +628,9 @@ function App() {
                     <ExpandIcon className="button-icon" size={16} />
                     <span>Open full map</span>
                   </button>
-                  <span className="panel-meta">{formatPercent(geocodedCoveragePercent)} mapped</span>
+                  <span className="panel-meta">
+                    <AnimatedNumber value={geocodedCoveragePercent} formatter={formatPercent} /> mapped
+                  </span>
                 </div>
               </div>
               <InstallationMap installations={installationsWithTerritory} theme={theme} />
@@ -656,7 +690,9 @@ function App() {
                         <li key={state}>
                           <span className="state-name">{state}</span>
                           <span className="state-metrics">
-                            {formatNumber(count)} <span className="state-divider">•</span> {formatPercent(share * 100)}
+                            <AnimatedNumber value={count} formatter={formatInteger} />
+                            <span className="state-divider">•</span>
+                            <AnimatedNumber value={share * 100} formatter={formatPercent} />
                           </span>
                         </li>
                       ))}
@@ -709,9 +745,9 @@ function App() {
                           <div className="utility-details">
                             <span className="utility-name">{entry.name}</span>
                             <span className="utility-metrics">
-                              {formatNumber(entry.count)} installs
+                              <AnimatedNumber value={entry.count} formatter={formatInteger} /> installs
                               <span className="utility-divider">•</span>
-                              {formatPercent(entry.share * 100)} coverage
+                              <AnimatedNumber value={entry.share * 100} formatter={formatPercent} /> coverage
                             </span>
                           </div>
                         </li>
@@ -740,7 +776,11 @@ function App() {
               onClick={() => setActiveTab('list')}
             >
               <ListIcon className="tab-icon" size={18} />
-              <span className="tab-label">Installation list ({installations.length})</span>
+              <span className="tab-label">
+                Installation list (
+                <AnimatedNumber value={installations.length} formatter={formatInteger} />
+                )
+              </span>
             </button>
             <button
               className={`tab ${activeTab === 'map' ? 'active' : ''}`}
@@ -779,7 +819,9 @@ function App() {
                     <ExpandIcon className="button-icon" size={16} />
                     <span>Open full map</span>
                   </button>
-                  <span className="panel-meta">{formatPercent(geocodedCoveragePercent)} mapped</span>
+                  <span className="panel-meta">
+                    <AnimatedNumber value={geocodedCoveragePercent} formatter={formatPercent} /> mapped
+                  </span>
                 </div>
                 <InstallationMap installations={installationsWithTerritory} theme={theme} />
               </div>
@@ -809,7 +851,9 @@ function App() {
                 </p>
               </div>
               <div className="panel-actions map-modal__actions">
-                <span className="panel-meta">{formatPercent(geocodedCoveragePercent)} mapped</span>
+                <span className="panel-meta">
+                  <AnimatedNumber value={geocodedCoveragePercent} formatter={formatPercent} /> mapped
+                </span>
                 <button
                   type="button"
                   className="panel-action-button panel-action-button--ghost map-modal__close"
