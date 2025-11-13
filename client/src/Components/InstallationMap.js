@@ -4,6 +4,78 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { LocationIcon, PowerIcon, CalendarIcon, NoteIcon, MapIcon } from '../Icons';
 
+const ANNUAL_OUTPUT_PER_KW = 1350;
+
+const dateFormatter = new Intl.DateTimeFormat('en-US', {
+  month: 'short',
+  day: 'numeric',
+  year: 'numeric'
+});
+
+const numberFormatter = new Intl.NumberFormat('en-US');
+
+const formatInstallDate = (value) => {
+  if (!value) {
+    return '—';
+  }
+
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) {
+    return '—';
+  }
+
+  return dateFormatter.format(parsed);
+};
+
+const getRelativeAge = (value) => {
+  if (!value) {
+    return '—';
+  }
+
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) {
+    return '—';
+  }
+
+  const now = new Date();
+  const diffMs = now.getTime() - parsed.getTime();
+
+  const diffDays = Math.round(diffMs / 86_400_000);
+
+  if (diffDays <= 0) {
+    return 'Just completed';
+  }
+
+  if (diffDays === 1) {
+    return '1 day ago';
+  }
+
+  if (diffDays < 7) {
+    return `${diffDays} days ago`;
+  }
+
+  const diffWeeks = Math.floor(diffDays / 7);
+  if (diffWeeks < 9) {
+    return `${diffWeeks} wk${diffWeeks === 1 ? '' : 's'} ago`;
+  }
+
+  const diffMonths = Math.floor(diffDays / 30);
+  if (diffMonths < 24) {
+    return `${diffMonths} mo${diffMonths === 1 ? '' : 's'} ago`;
+  }
+
+  const diffYears = Math.floor(diffDays / 365);
+  return `${diffYears} yr${diffYears === 1 ? '' : 's'} ago`;
+};
+
+const getProductionEstimate = (systemSize) => {
+  const numeric = Number(systemSize);
+  if (!Number.isFinite(numeric) || numeric <= 0) {
+    return null;
+  }
+  return Math.round(numeric * ANNUAL_OUTPUT_PER_KW);
+};
+
 const STADIA_API_KEY = process.env.REACT_APP_STADIA_API_KEY;
 const STAMEN_TONER_URL_BASE = 'https://tiles.stadiamaps.com/tiles/stamen_toner/{z}/{x}/{y}{r}.png';
 const stamenTonerUrl = STADIA_API_KEY
@@ -198,77 +270,97 @@ const InstallationMap = ({ installations, theme = 'light' }) => {
               position={[installation.latitude, installation.longitude]}
               icon={getCustomIcon(installation.utilityTerritory?.color)}
             >
-              <Popup className="custom-popup">
-                <div className="popup-content">
-                  <div className="popup-header">
-                    <div className="popup-icon" aria-hidden="true">
-                      <PowerIcon size={20} />
-                    </div>
-                    <div className="popup-title">
-                      <h3>{installation.homeownerName}</h3>
-                      <p className="popup-subtitle">{installation.systemSize} system</p>
-                    </div>
-                  </div>
-                  
-                  <div className="popup-body">
-                    <div className="popup-section">
-                      <div className="popup-label">
-                        <LocationIcon size={16} className="popup-label-icon" />
-                        <span>Location</span>
-                      </div>
-                      <div className="popup-value">
-                        {installation.address}<br/>
-                        {installation.city}, {installation.state} {installation.zip}
-                      </div>
-                    </div>
+              <Popup className="installation-popup" offset={[0, -12]}>
+                {(() => {
+                  const productionEstimate = getProductionEstimate(installation.systemSize);
+                  const formattedDate = formatInstallDate(installation.installDate);
+                  const relativeAge = getRelativeAge(installation.installDate);
+                  const territory = installation.utilityTerritory;
+                  const locationLine = [installation.city, installation.state].filter(Boolean).join(', ');
+                  const postalLine = installation.zip ? `• ${installation.zip}` : '';
 
-                    {installation.utilityTerritory && (
-                      <div className="popup-section">
-                        <div className="popup-label">
-                          <MapIcon size={16} className="popup-label-icon" />
-                          <span>Utility Territory</span>
+                  return (
+                    <div className="popup-card">
+                      <header className="popup-card-header">
+                        <div className="popup-card-icon" aria-hidden="true">
+                          <PowerIcon size={18} />
                         </div>
-                        <div className="popup-value">{installation.utilityTerritory.name}</div>
-                      </div>
-                    )}
-                    
-                    <div className="popup-section">
-                      <div className="popup-label">
-                        <PowerIcon size={16} className="popup-label-icon" />
-                        <span>System Size</span>
-                      </div>
-                      <div className="popup-value">{installation.systemSize}</div>
-                    </div>
-                    
-                    <div className="popup-section">
-                      <div className="popup-label">
-                        <CalendarIcon size={16} className="popup-label-icon" />
-                        <span>Install Date</span>
-                      </div>
-                      <div className="popup-value">
-                        {new Date(installation.installDate).toLocaleDateString('en-US', {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric'
-                        })}
-                      </div>
-                    </div>
-                    
-                    {installation.notes && (
-                      <div className="popup-section">
-                        <div className="popup-label">
-                          <NoteIcon size={16} className="popup-label-icon" />
-                          <span>Notes</span>
+                        <div className="popup-card-title-group">
+                          <h3 className="popup-card-title">{installation.homeownerName || 'Unnamed install'}</h3>
+                          <p className="popup-card-subtitle">{locationLine || 'Location pending'} {postalLine}</p>
                         </div>
-                        <div className="popup-value">{installation.notes}</div>
+                      </header>
+
+                      <div className="popup-card-stats">
+                        {territory && (
+                          <span className="popup-chip popup-chip--utility">
+                            <span className="popup-chip-dot" style={{ backgroundColor: territory.color || '#4aa8ff' }} aria-hidden="true" />
+                            {territory.name}
+                          </span>
+                        )}
+                        {installation.systemSize && (
+                          <span className="popup-chip">
+                            <PowerIcon size={14} aria-hidden="true" />
+                            {installation.systemSize} kW
+                          </span>
+                        )}
+                        <span className="popup-chip">
+                          <CalendarIcon size={14} aria-hidden="true" />
+                          {formattedDate}
+                        </span>
+                        <span className="popup-chip popup-chip--muted">{relativeAge}</span>
                       </div>
-                    )}
-                  </div>
-                  
-                  <div className="popup-footer">
-                    Installation ID: {installation.id}
-                  </div>
-                </div>
+
+                      <dl className="popup-card-details">
+                        {installation.address && (
+                          <div className="popup-detail-row">
+                            <dt>
+                              <LocationIcon size={14} className="popup-detail-icon" aria-hidden="true" />
+                              Address
+                            </dt>
+                            <dd>
+                              {installation.address}
+                            </dd>
+                          </div>
+                        )}
+                        {productionEstimate && (
+                          <div className="popup-detail-row">
+                            <dt>
+                              <PowerIcon size={14} className="popup-detail-icon" aria-hidden="true" />
+                              Est. output
+                            </dt>
+                            <dd>
+                              ≈ {numberFormatter.format(productionEstimate)} kWh/yr
+                            </dd>
+                          </div>
+                        )}
+                        {territory && (
+                          <div className="popup-detail-row">
+                            <dt>
+                              <MapIcon size={14} className="popup-detail-icon" aria-hidden="true" />
+                              Territory
+                            </dt>
+                            <dd>{territory.name}</dd>
+                          </div>
+                        )}
+                        {installation.notes && (
+                          <div className="popup-detail-row popup-detail-row--notes">
+                            <dt>
+                              <NoteIcon size={14} className="popup-detail-icon" aria-hidden="true" />
+                              Notes
+                            </dt>
+                            <dd>{installation.notes}</dd>
+                          </div>
+                        )}
+                      </dl>
+
+                      <footer className="popup-card-footer">
+                        <span className="popup-id-label">ID</span>
+                        <span className="popup-id-value">{installation.id}</span>
+                      </footer>
+                    </div>
+                  );
+                })()}
               </Popup>
             </Marker>
           ))}
