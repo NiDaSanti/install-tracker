@@ -265,6 +265,8 @@ body {
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.7px;
+  font-family: var(--font-display);
+  font-weight: 600;
   color: var(--color-text-muted);
 }
 
@@ -278,6 +280,20 @@ body {
 
 .records-table tr:hover {
   background: rgba(0, 191, 240, 0.04);
+}
+
+.lifecycle-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(0, 191, 240, 0.12);
+  color: var(--color-primary-darker);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  margin-top: 6px;
 }
 
 .records-table .actions-header {
@@ -465,9 +481,7 @@ body {
 }
 
 .records-card-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 20px;
+  display: none;
   align-items: stretch;
 }
 
@@ -1089,6 +1103,11 @@ body[data-theme='dark'] .utility-chip {
   background: rgba(74, 168, 255, 0.16);
   border-color: rgba(74, 168, 255, 0.28);
   color: #d4e8ff;
+}
+
+body[data-theme='dark'] .lifecycle-pill {
+  background: rgba(74, 168, 255, 0.18);
+  color: #e0f1ff;
 }
 
 body[data-theme='dark'] .utility-dot {

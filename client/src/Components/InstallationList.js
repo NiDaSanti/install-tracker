@@ -154,7 +154,199 @@ function InstallationList({ installations, onDelete, onUpdate }) {
       {installations.length === 0 ? (
         <p className="empty-state">No installations have been added yet.</p>
       ) : (
-        <div className="records-card-grid">
+        <>
+          <div className="table-wrapper">
+            <table className="records-table">
+              <thead>
+                <tr>
+                  <th scope="col">Project</th>
+                  <th scope="col">Region</th>
+                  <th scope="col">Utility</th>
+                  <th scope="col">System</th>
+                  <th scope="col">Lifecycle</th>
+                  <th scope="col">Notes</th>
+                  <th scope="col" className="actions-header">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {installations.map((installation) => {
+                  const territory = installation.utilityTerritory;
+                  const productionEstimate = getProductionEstimate(installation.systemSize);
+                  const formattedDate = formatDate(installation.installDate);
+                  const relativeAge = getRelativeAge(installation.installDate);
+                  const isEditing = editingId === installation.id;
+
+                  return (
+                    <tr key={`${installation.id}-row`}>
+                      {isEditing ? (
+                        <>
+                          <td data-label="Project">
+                            <div className="edit-field-group">
+                              <input
+                                className="table-input"
+                                value={editForm.homeownerName}
+                                onChange={(e) => handleFieldChange('homeownerName', e.target.value)}
+                                placeholder="Homeowner"
+                              />
+                              <input
+                                className="table-input"
+                                value={editForm.address}
+                                onChange={(e) => handleFieldChange('address', e.target.value)}
+                                placeholder="Street address"
+                              />
+                            </div>
+                          </td>
+                          <td data-label="Region">
+                            <div className="edit-inline-grid">
+                              <input
+                                className="table-input"
+                                value={editForm.city}
+                                onChange={(e) => handleFieldChange('city', e.target.value)}
+                                placeholder="City"
+                              />
+                              <input
+                                className="table-input table-input--short"
+                                value={editForm.state}
+                                onChange={(e) => handleFieldChange('state', e.target.value)}
+                                placeholder="State"
+                                maxLength={2}
+                              />
+                              <input
+                                className="table-input table-input--zip"
+                                value={editForm.zip}
+                                onChange={(e) => handleFieldChange('zip', e.target.value)}
+                                placeholder="ZIP"
+                              />
+                            </div>
+                          </td>
+                          <td data-label="Utility" className="table-cell--readonly">
+                            {territory?.name || '—'}
+                          </td>
+                          <td data-label="System">
+                            <input
+                              className="table-input"
+                              type="number"
+                              value={editForm.systemSize}
+                              onChange={(e) => handleFieldChange('systemSize', e.target.value)}
+                              placeholder="System size (kW)"
+                            />
+                          </td>
+                          <td data-label="Lifecycle">
+                            <input
+                              className="table-input"
+                              type="date"
+                              value={editForm.installDate}
+                              onChange={(e) => handleFieldChange('installDate', e.target.value)}
+                            />
+                          </td>
+                          <td data-label="Notes">
+                            <textarea
+                              className="notes-textarea"
+                              rows={3}
+                              value={editForm.notes || ''}
+                              onChange={(e) => handleFieldChange('notes', e.target.value)}
+                              placeholder="Add context or follow-up steps"
+                            />
+                          </td>
+                          <td data-label="Actions" className="actions-cell">
+                            <div className="table-actions">
+                              <button
+                                type="button"
+                                className="table-action table-action--primary"
+                                onClick={() => handleSave(installation.id)}
+                              >
+                                Save
+                              </button>
+                              <button
+                                type="button"
+                                className="table-action table-action--neutral"
+                                onClick={handleCancel}
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          </td>
+                        </>
+                      ) : (
+                        <>
+                          <td data-label="Project">
+                            <span className="cell-primary">{installation.homeownerName || '—'}</span>
+                            <span className="cell-secondary">{installation.address || 'No street address'}</span>
+                          </td>
+                          <td data-label="Region">
+                            <span className="cell-primary">
+                              {installation.city && installation.state
+                                ? `${installation.city}, ${installation.state}`
+                                : '—'}
+                            </span>
+                            <span className="cell-secondary">{installation.zip || 'No postal code'}</span>
+                          </td>
+                          <td data-label="Utility">
+                            {territory ? (
+                              <span className="utility-chip" title={territory.name}>
+                                <span
+                                  className="utility-dot"
+                                  style={{ backgroundColor: territory.color || '#4aa8ff' }}
+                                  aria-hidden="true"
+                                />
+                                <span className="utility-label">{territory.name}</span>
+                              </span>
+                            ) : (
+                              <span className="cell-secondary">—</span>
+                            )}
+                          </td>
+                          <td data-label="System">
+                            <span className="cell-primary">
+                              {installation.systemSize ? `${installation.systemSize} kW` : '—'}
+                            </span>
+                            <span className="cell-secondary">
+                              {productionEstimate
+                                ? `≈ ${numberFormatter.format(productionEstimate)} kWh/yr`
+                                : 'No output estimate'}
+                            </span>
+                          </td>
+                          <td data-label="Lifecycle">
+                            <span className="cell-primary">{formattedDate}</span>
+                            {relativeAge && relativeAge !== '—' ? (
+                              <span className="lifecycle-pill">{relativeAge}</span>
+                            ) : (
+                              <span className="cell-secondary">Schedule TBD</span>
+                            )}
+                          </td>
+                          <td data-label="Notes">
+                            <div className="notes-cell" title={installation.notes || ''}>
+                              {installation.notes || '—'}
+                            </div>
+                          </td>
+                          <td data-label="Actions" className="actions-cell">
+                            <div className="table-actions">
+                              <button
+                                type="button"
+                                className="table-action table-action--primary"
+                                onClick={() => handleEdit(installation)}
+                              >
+                                <EditIcon size={16} className="table-action-icon" aria-hidden="true" />
+                                <span>Edit</span>
+                              </button>
+                              <button
+                                type="button"
+                                className="table-action table-action--danger"
+                                onClick={() => handleDelete(installation.id)}
+                              >
+                                <TrashIcon size={16} className="table-action-icon" aria-hidden="true" />
+                                <span>Delete</span>
+                              </button>
+                            </div>
+                          </td>
+                        </>
+                      )}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          <div className="records-card-grid">
           {installations.map((installation) => {
             const territory = installation.utilityTerritory;
             const productionEstimate = getProductionEstimate(installation.systemSize);
@@ -381,6 +573,7 @@ function InstallationList({ installations, onDelete, onUpdate }) {
             );
           })}
         </div>
+        </>
       )}
     </section>
   );
