@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import apiClient from './apiClient';
 import './App.css';
 import InstallationList from './Components/InstallationList';
@@ -13,6 +13,8 @@ import {
   AddIcon,
   ListIcon,
   MapIcon,
+  ExpandIcon,
+  CloseIcon,
   WarningIcon,
   PowerIcon,
   CalendarIcon,
@@ -31,7 +33,6 @@ function App() {
     if (typeof window === 'undefined') {
       return 'light';
     }
-
     const storedTheme = window.localStorage.getItem('install-tracker-theme');
     if (storedTheme === 'light' || storedTheme === 'dark') {
       return storedTheme;
@@ -60,6 +61,8 @@ function App() {
     }
     return window.matchMedia(DASHBOARD_MEDIA_QUERY).matches;
   });
+  const [isMapModalOpen, setIsMapModalOpen] = useState(false);
+  const modalRef = useRef(null);
 
   const fetchInstallations = async () => {
     try {
@@ -131,6 +134,61 @@ function App() {
     setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
   };
 
+  useEffect(() => {
+    if (typeof document === 'undefined' || !isMapModalOpen) {
+      return undefined;
+    }
+
+    const { body } = document;
+    const previousOverflow = body.style.overflow;
+    body.style.overflow = 'hidden';
+
+    return () => {
+      body.style.overflow = previousOverflow;
+    };
+  }, [isMapModalOpen]);
+
+  const openMapModal = () => {
+    setIsMapModalOpen(true);
+  };
+
+  const closeMapModal = () => {
+    setIsMapModalOpen(false);
+  };
+
+  useEffect(() => {
+    if (!isMapModalOpen || typeof window === 'undefined') {
+      return undefined;
+    }
+
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        setIsMapModalOpen(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isMapModalOpen]);
+
+  useEffect(() => {
+    if (!isMapModalOpen || !modalRef.current) {
+      return undefined;
+    }
+
+    const node = modalRef.current;
+    try {
+      node.focus({ preventScroll: true });
+    } catch (focusError) {
+      node.focus();
+    }
+
+    return undefined;
+  }, [isMapModalOpen]);
+
   const isDarkTheme = theme === 'dark';
 
   const handleLoginSuccess = (token, user) => {
@@ -146,6 +204,7 @@ function App() {
     setCurrentUser(null);
     setInstallations([]);
     setError(null);
+    setIsMapModalOpen(false);
   };
 
   useEffect(() => {
@@ -155,6 +214,7 @@ function App() {
       setCurrentUser(null);
       setInstallations([]);
       setError(null);
+      setIsMapModalOpen(false);
     };
 
     if (typeof window !== 'undefined') {
@@ -527,7 +587,17 @@ function App() {
                   <h3>Geospatial Intelligence</h3>
                   <p className="panel-subtitle">Situational awareness across the field</p>
                 </div>
-                <span className="panel-meta">{formatPercent(geocodedCoveragePercent)} mapped</span>
+                <div className="panel-actions">
+                  <button
+                    type="button"
+                    className="panel-action-button"
+                    onClick={openMapModal}
+                  >
+                    <ExpandIcon className="button-icon" size={16} />
+                    <span>Full View</span>
+                  </button>
+                  <span className="panel-meta">{formatPercent(geocodedCoveragePercent)} mapped</span>
+                </div>
               </div>
               <InstallationMap installations={installationsWithTerritory} theme={theme} />
             </section>
@@ -700,6 +770,17 @@ function App() {
 
             {activeTab === 'map' && (
               <div className="tab-panel map-panel">
+                <div className="map-panel-actions">
+                  <button
+                    type="button"
+                    className="panel-action-button"
+                    onClick={openMapModal}
+                  >
+                    <ExpandIcon className="button-icon" size={16} />
+                    <span>Full View</span>
+                  </button>
+                  <span className="panel-meta">{formatPercent(geocodedCoveragePercent)} mapped</span>
+                </div>
                 <InstallationMap installations={installationsWithTerritory} theme={theme} />
               </div>
             )}
@@ -707,6 +788,50 @@ function App() {
           </div>
         )}
       </div>
+
+      {isMapModalOpen && (
+        <div className="map-modal">
+          <div className="map-modal__backdrop" onClick={closeMapModal} />
+          <div
+            className="map-modal__content"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="map-modal-title"
+            aria-describedby="map-modal-description"
+            ref={modalRef}
+            tabIndex={-1}
+          >
+            <header className="map-modal__header">
+              <div className="map-modal__title-block">
+                <h2 className="map-modal__title" id="map-modal-title">Geospatial Command</h2>
+                <p className="map-modal__subtitle" id="map-modal-description">
+                  Expanded mission view spanning every mapped installation
+                </p>
+              </div>
+              <div className="panel-actions map-modal__actions">
+                <span className="panel-meta">{formatPercent(geocodedCoveragePercent)} mapped</span>
+                <button
+                  type="button"
+                  className="panel-action-button panel-action-button--ghost map-modal__close"
+                  onClick={closeMapModal}
+                >
+                  <CloseIcon className="button-icon" size={16} />
+                  <span>Close</span>
+                </button>
+              </div>
+            </header>
+            <div className="map-modal__body">
+              <InstallationMap
+                key={`modal-${theme}`}
+                installations={installationsWithTerritory}
+                theme={theme}
+                variant="expanded"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
       <footer className="app-footer">
         <div className="app-footer-inner">
           <div className="app-footer-brand">

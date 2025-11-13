@@ -173,7 +173,7 @@ const getCustomIcon = (accentColor) => {
   return icon;
 };
 
-const InstallationMap = ({ installations, theme = 'light' }) => {
+const InstallationMap = ({ installations, theme = 'light', variant = 'standard' }) => {
   const defaultCenter = [34.0522, -118.2437]; // Default to Los Angeles
   const defaultZoom = 10;
   const [styleKey, setStyleKey] = useState(() => (theme === 'dark' ? 'cartoDarkMatter' : 'cartoPositron'));
@@ -206,8 +206,11 @@ const InstallationMap = ({ installations, theme = 'light' }) => {
     return Array.from(territoryMap.values());
   }, [installations]);
 
+  const wrapperClassName = variant === 'expanded' ? 'map-wrapper map-wrapper--expanded' : 'map-wrapper';
+  const frameClassName = variant === 'expanded' ? 'map-frame map-frame--expanded' : 'map-frame';
+
   return (
-    <div className="map-wrapper">
+    <div className={wrapperClassName}>
       <div className="map-style-toolbar">
         <label className="map-style-label" htmlFor="map-style-select">
           Map style
@@ -250,7 +253,7 @@ const InstallationMap = ({ installations, theme = 'light' }) => {
       <MapContainer
         center={defaultCenter}
         zoom={defaultZoom}
-        className="map-frame"
+        className={frameClassName}
       >
         {/* Dynamic map tiles */}
         <TileLayer

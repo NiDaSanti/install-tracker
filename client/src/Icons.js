@@ -64,6 +64,21 @@ export function MapIcon({ size = 18, color = 'currentColor', className }) {
   );
 }
 
+export function ExpandIcon({ size = 18, color = 'currentColor', className }) {
+  return (
+    <SvgIcon size={size} color={color} className={className}>
+      <path d="M9 4H4v5" />
+      <path d="m4 4 5 5" />
+      <path d="M15 4h5v5" />
+      <path d="m20 4-5 5" />
+      <path d="M9 20H4v-5" />
+      <path d="m4 20 5-5" />
+      <path d="M15 20h5v-5" />
+      <path d="m20 20-5-5" />
+    </SvgIcon>
+  );
+}
+
 export function SunIcon({ size = 18, color = 'currentColor', className }) {
   return (
     <SvgIcon size={size} color={color} className={className}>
@@ -94,6 +109,15 @@ export function LogoutIcon({ size = 18, color = 'currentColor', className }) {
       <path d="M15.5 7.5 20 12l-4.5 4.5" />
       <path d="M9.5 12H20" />
       <path d="M13.5 20H6.3A2.3 2.3 0 0 1 4 17.7V6.3A2.3 2.3 0 0 1 6.3 4H13.5" />
+    </SvgIcon>
+  );
+}
+
+export function CloseIcon({ size = 18, color = 'currentColor', className }) {
+  return (
+    <SvgIcon size={size} color={color} className={className}>
+      <path d="m7 7 10 10" />
+      <path d="m17 7-10 10" />
     </SvgIcon>
   );
 }
