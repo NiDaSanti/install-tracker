@@ -53,11 +53,12 @@ function App() {
   });
 
   const [currentUser, setCurrentUser] = useState(null);
+  const DASHBOARD_MEDIA_QUERY = '(min-width: 820px)';
   const [isDesktop, setIsDesktop] = useState(() => {
     if (typeof window === 'undefined') {
       return false;
     }
-    return window.matchMedia('(min-width: 1200px)').matches;
+    return window.matchMedia(DASHBOARD_MEDIA_QUERY).matches;
   });
 
   const fetchInstallations = async () => {
@@ -103,7 +104,7 @@ function App() {
       return undefined;
     }
 
-    const mediaQuery = window.matchMedia('(min-width: 1200px)');
+  const mediaQuery = window.matchMedia(DASHBOARD_MEDIA_QUERY);
     const handleChange = (event) => {
       setIsDesktop(event.matches);
     };
