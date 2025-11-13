@@ -34,8 +34,8 @@ function Login({ onSuccess }) {
         <div className="auth-logo" aria-hidden="true">
           <LogoIcon size={42} />
         </div>
-        <h1>Installation Tracker</h1>
-        <p className="auth-subtitle">Secure workspace for field operations teams.</p>
+  <h1>Installation Tracker</h1>
+  <p className="auth-subtitle">Sign in to manage installations.</p>
         <form className="auth-form" onSubmit={handleSubmit}>
           <label htmlFor="username">Username</label>
           <input
@@ -60,7 +60,7 @@ function Login({ onSuccess }) {
           {error && <div className="auth-error">{error}</div>}
 
           <button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? 'Signing in…' : 'Sign In'}
+            {isSubmitting ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
       </div>

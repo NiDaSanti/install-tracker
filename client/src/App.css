@@ -67,7 +67,7 @@ body[data-theme='dark'] {
   --color-tab-active-bg: rgba(255, 255, 255, 0.03);
   --color-tab-inactive-text: #a9b7c6;
   --color-tab-indicator: #4aa8ff;
-   --color-table-header: rgba(13, 23, 35, 0.9);
+  --color-table-header: rgba(13, 23, 35, 0.9);
   --color-table-row-hover: rgba(255, 255, 255, 0.05);
   --color-success: #2ecc71;
   --color-success-dark: #27ae60;
@@ -85,12 +85,6 @@ body[data-theme='dark'] {
   --shadow-strong: 0 24px 60px rgba(0, 0, 0, 0.55);
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
 body {
   font-family: var(--font-sans);
   background: var(--color-background);
@@ -100,6 +94,79 @@ body {
   -moz-osx-font-smoothing: grayscale;
   transition: background var(--transition-medium), color var(--transition-medium);
   background-attachment: fixed;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-display);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.subtitle,
+.section-subtitle,
+.panel-subtitle,
+.panel-meta,
+.metric-card-header,
+.metric-subtext,
+.tab,
+.tab-label,
+.panel-actions .panel-meta,
+.panel-action-button,
+.panel-action-button span,
+.theme-toggle-button,
+.sign-out-button,
+.table-action,
+.utility-chip,
+.record-card-chip,
+.record-card-title-group h3,
+.record-card-detail dt,
+.panel-heading h3,
+.app-footer-badge,
+.app-footer-title,
+.map-style-label,
+.map-style-select,
+.map-style-hint,
+.map-panel-actions .panel-meta,
+.map-modal__title,
+.map-modal__subtitle,
+.map-modal__actions .panel-meta,
+.map-modal__close,
+.utility-legend-item,
+.lifecycle-pill,
+.state-name,
+.activity-primary,
+.metric-value,
+.metric-label,
+.app-title-text h1,
+.app-title-text .subtitle,
+.app-footer-subtitle,
+.app-footer-link,
+.app-footer-nav a,
+.table-wrapper th,
+.insight-card h4 {
+  font-family: var(--font-display);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.panel-action-button,
+.theme-toggle-button,
+.sign-out-button,
+.tab,
+button,
+.panel-meta,
+.table-action,
+.utility-chip,
+.map-style-select,
+.map-style-hint,
+.record-card-chip,
+.lifecycle-pill {
+  font-weight: 700;
 }
 
 .auth-screen {
@@ -126,9 +193,9 @@ body {
 .app-container {
   flex: 1;
   width: 100%;
-  max-width: 1560px;
+  max-width: clamp(1200px, 95vw, 1920px);
   margin: 0 auto;
-  padding: 28px clamp(28px, 4vw, 72px) 44px;
+  padding: 28px clamp(24px, 3vw, 56px) 48px;
   transition: color var(--transition-medium);
 }
 
@@ -2534,6 +2601,51 @@ h2 {
   opacity: 1 !important;
   background: rgba(255, 255, 255, 0.12) !important;
   border-radius: 6px;
+}
+
+/* Wide Screen Enhancements */
+@media (min-width: 1440px) {
+  .app-container {
+    max-width: clamp(1480px, 92vw, 2200px);
+    padding: 36px clamp(48px, 4vw, 88px) 68px;
+  }
+
+  .command-grid {
+    gap: 32px;
+  }
+
+  .command-panel {
+    padding: 26px 32px;
+  }
+
+  .command-panel--map {
+    grid-column: span 9;
+  }
+
+  .command-panel--map .map-wrapper {
+    min-height: 760px;
+  }
+
+  .command-panel--map .map-frame {
+    min-height: 600px;
+  }
+
+  .map-modal__overlay {
+    padding: 48px;
+  }
+
+  .map-modal__content {
+    width: min(1120px, 90vw);
+    height: min(90vh, 800px);
+  }
+
+  .map-modal__header {
+    padding: 28px 32px 18px;
+  }
+
+  .map-modal__body {
+    padding: 0 32px 32px;
+  }
 }
 
 /* Responsive Design */

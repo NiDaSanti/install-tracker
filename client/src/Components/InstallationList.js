@@ -95,8 +95,8 @@ function InstallationList({ installations, onDelete, onUpdate }) {
       await apiClient.delete(`/api/installations/${id}`);
       onDelete(id);
     } catch (error) {
-      console.error("Failed to delete installation:", error);
-      alert("Failed to delete installation.");
+  console.error("Failed to delete installation:", error);
+  alert('Could not delete installation.');
     }
   };
 
@@ -128,10 +128,10 @@ function InstallationList({ installations, onDelete, onUpdate }) {
       onUpdate(response.data);
       setEditingId(null);
       setEditForm({});
-      alert('Installation updated successfully!');
+  alert('Installation saved.');
     } catch (error) {
       console.error('Error updating installation:', error);
-      alert('Failed to update installation');
+  alert('Could not update installation.');
     }
   };
 
@@ -147,23 +147,23 @@ function InstallationList({ installations, onDelete, onUpdate }) {
           <ListIcon size={20} />
         </div>
         <div>
-          <h2>Installation Records</h2>
-          <p className="section-subtitle">{installations.length} active installation{installations.length === 1 ? '' : 's'} tracked</p>
+          <h2>Installations</h2>
+          <p className="section-subtitle">Tracking {installations.length} installation{installations.length === 1 ? '' : 's'}</p>
         </div>
       </div>
       {installations.length === 0 ? (
-        <p className="empty-state">No installations have been added yet.</p>
+        <p className="empty-state">No installations yet.</p>
       ) : (
         <>
           <div className="table-wrapper">
             <table className="records-table">
               <thead>
                 <tr>
-                  <th scope="col">Project</th>
-                  <th scope="col">Region</th>
+                  <th scope="col">Homeowner</th>
+                  <th scope="col">Location</th>
                   <th scope="col">Utility</th>
-                  <th scope="col">System</th>
-                  <th scope="col">Lifecycle</th>
+                  <th scope="col">System size</th>
+                  <th scope="col">Install date</th>
                   <th scope="col">Notes</th>
                   <th scope="col" className="actions-header">Actions</th>
                 </tr>
@@ -180,7 +180,7 @@ function InstallationList({ installations, onDelete, onUpdate }) {
                     <tr key={`${installation.id}-row`}>
                       {isEditing ? (
                         <>
-                          <td data-label="Project">
+                          <td data-label="Homeowner">
                             <div className="edit-field-group">
                               <input
                                 className="table-input"
@@ -196,7 +196,7 @@ function InstallationList({ installations, onDelete, onUpdate }) {
                               />
                             </div>
                           </td>
-                          <td data-label="Region">
+                          <td data-label="Location">
                             <div className="edit-inline-grid">
                               <input
                                 className="table-input"
@@ -222,7 +222,7 @@ function InstallationList({ installations, onDelete, onUpdate }) {
                           <td data-label="Utility" className="table-cell--readonly">
                             {territory?.name || '—'}
                           </td>
-                          <td data-label="System">
+                          <td data-label="System size">
                             <input
                               className="table-input"
                               type="number"
@@ -231,7 +231,7 @@ function InstallationList({ installations, onDelete, onUpdate }) {
                               placeholder="System size (kW)"
                             />
                           </td>
-                          <td data-label="Lifecycle">
+                          <td data-label="Install date">
                             <input
                               className="table-input"
                               type="date"
@@ -245,7 +245,7 @@ function InstallationList({ installations, onDelete, onUpdate }) {
                               rows={3}
                               value={editForm.notes || ''}
                               onChange={(e) => handleFieldChange('notes', e.target.value)}
-                              placeholder="Add context or follow-up steps"
+                              placeholder="Add notes"
                             />
                           </td>
                           <td data-label="Actions" className="actions-cell">
@@ -269,17 +269,17 @@ function InstallationList({ installations, onDelete, onUpdate }) {
                         </>
                       ) : (
                         <>
-                          <td data-label="Project">
+                          <td data-label="Homeowner">
                             <span className="cell-primary">{installation.homeownerName || '—'}</span>
-                            <span className="cell-secondary">{installation.address || 'No street address'}</span>
+                            <span className="cell-secondary">{installation.address || 'No address'}</span>
                           </td>
-                          <td data-label="Region">
+                          <td data-label="Location">
                             <span className="cell-primary">
                               {installation.city && installation.state
                                 ? `${installation.city}, ${installation.state}`
                                 : '—'}
                             </span>
-                            <span className="cell-secondary">{installation.zip || 'No postal code'}</span>
+                            <span className="cell-secondary">{installation.zip || 'No ZIP'}</span>
                           </td>
                           <td data-label="Utility">
                             {territory ? (
@@ -295,22 +295,22 @@ function InstallationList({ installations, onDelete, onUpdate }) {
                               <span className="cell-secondary">—</span>
                             )}
                           </td>
-                          <td data-label="System">
+                          <td data-label="System size">
                             <span className="cell-primary">
                               {installation.systemSize ? `${installation.systemSize} kW` : '—'}
                             </span>
                             <span className="cell-secondary">
                               {productionEstimate
                                 ? `≈ ${numberFormatter.format(productionEstimate)} kWh/yr`
-                                : 'No output estimate'}
+                                : 'No estimate'}
                             </span>
                           </td>
-                          <td data-label="Lifecycle">
+                          <td data-label="Install date">
                             <span className="cell-primary">{formattedDate}</span>
                             {relativeAge && relativeAge !== '—' ? (
                               <span className="lifecycle-pill">{relativeAge}</span>
                             ) : (
-                              <span className="cell-secondary">Schedule TBD</span>
+                              <span className="cell-secondary">No date set</span>
                             )}
                           </td>
                           <td data-label="Notes">
@@ -364,8 +364,8 @@ function InstallationList({ installations, onDelete, onUpdate }) {
                       <ListIcon size={18} />
                     </div>
                     <div className="record-card-title-group">
-                      <h3>Edit Installation</h3>
-                      <p className="record-card-subtitle">Update homeowner and site details</p>
+                      <h3>Edit installation</h3>
+                      <p className="record-card-subtitle">Update the installation details</p>
                     </div>
                   </header>
 
@@ -382,7 +382,7 @@ function InstallationList({ installations, onDelete, onUpdate }) {
                     </div>
 
                     <div className="record-card-field-group">
-                      <label htmlFor={`address-${installation.id}`}>Street Address</label>
+                      <label htmlFor={`address-${installation.id}`}>Street address</label>
                       <input
                         id={`address-${installation.id}`}
                         className="table-input"
@@ -428,7 +428,7 @@ function InstallationList({ installations, onDelete, onUpdate }) {
 
                     <div className="record-card-field-row">
                       <div className="record-card-field-group">
-                        <label htmlFor={`size-${installation.id}`}>System Size (kW)</label>
+                        <label htmlFor={`size-${installation.id}`}>System size (kW)</label>
                         <input
                           id={`size-${installation.id}`}
                           className="table-input"
@@ -439,7 +439,7 @@ function InstallationList({ installations, onDelete, onUpdate }) {
                         />
                       </div>
                       <div className="record-card-field-group">
-                        <label htmlFor={`date-${installation.id}`}>Install Date</label>
+                        <label htmlFor={`date-${installation.id}`}>Install date</label>
                         <input
                           id={`date-${installation.id}`}
                           className="table-input"
@@ -458,7 +458,7 @@ function InstallationList({ installations, onDelete, onUpdate }) {
                         rows={4}
                         value={editForm.notes || ''}
                         onChange={(e) => handleFieldChange('notes', e.target.value)}
-                        placeholder="Add context, follow-ups, or site notes"
+                        placeholder="Add notes"
                       />
                     </div>
                   </div>
@@ -470,7 +470,7 @@ function InstallationList({ installations, onDelete, onUpdate }) {
                         className="table-action table-action--primary"
                         onClick={() => handleSave(installation.id)}
                       >
-                        Save Changes
+                        Save changes
                       </button>
                       <button
                         type="button"
@@ -492,9 +492,9 @@ function InstallationList({ installations, onDelete, onUpdate }) {
                     <ListIcon size={18} />
                   </div>
                   <div className="record-card-title-group">
-                    <h3>{installation.homeownerName || 'Unnamed Installation'}</h3>
+                    <h3>{installation.homeownerName || 'Unnamed installation'}</h3>
                     <p className="record-card-subtitle">
-                      {locationLine || 'Location pending'}
+                      {locationLine || 'Location not set'}
                       {postal ? <span className="record-card-subtitle-dot"> • {postal}</span> : null}
                     </p>
                   </div>

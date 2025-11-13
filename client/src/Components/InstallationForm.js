@@ -20,7 +20,7 @@ const InstallationForm = ({ onSubmit }) => {
     const geocodeResult = await geocodeAddress(fullAddress);
 
     if (!geocodeResult.success) {
-      alert(`Could not find coordinates for address. Please check the location.`);
+      alert('Could not verify that address. Please check it.');
       // You can choose to continue anyway or return here
       // return;
     }
@@ -59,21 +59,21 @@ const InstallationForm = ({ onSubmit }) => {
       setInstallDate('');
       setNotes('');
       
-      alert('Installation added successfully!');
+      alert('Installation saved.');
     } catch (error) {
       console.error('Error creating installation:', error);
-      alert('Failed to add installation. Please try again.');
+      alert('Could not add installation. Try again.');
     }
   };
 
 
   return (
     <form onSubmit={handleSubmit}>
-      <h2>Add New Installation</h2>
+      <h2>Add installation</h2>
       
       <div className="form-grid full-width">
         <div>
-          <label>Homeowner Name:</label>
+          <label>Homeowner name</label>
           <input
             type="text"
             value={homeownerName}
@@ -85,7 +85,7 @@ const InstallationForm = ({ onSubmit }) => {
 
       <div className="form-grid">
         <div>
-          <label>Street Address:</label>
+          <label>Street address</label>
           <input
             type="text"
             value={address}
@@ -94,7 +94,7 @@ const InstallationForm = ({ onSubmit }) => {
           />
         </div>
         <div>
-          <label>City:</label>
+          <label>City</label>
           <input
             type="text"
             value={city}
@@ -106,7 +106,7 @@ const InstallationForm = ({ onSubmit }) => {
 
       <div className="form-grid">
         <div>
-          <label>State:</label>
+          <label>State</label>
           <input
             type="text"
             value={state}
@@ -115,7 +115,7 @@ const InstallationForm = ({ onSubmit }) => {
           />
         </div>
         <div>
-          <label>Zip Code:</label>
+          <label>ZIP code</label>
           <input
             type="text"
             value={zip}
@@ -127,7 +127,7 @@ const InstallationForm = ({ onSubmit }) => {
 
       <div className="form-grid">
         <div>
-          <label>System Size (kW):</label>
+          <label>System size (kW)</label>
           <input
             type="number"
             step="0.1"
@@ -137,7 +137,7 @@ const InstallationForm = ({ onSubmit }) => {
           />
         </div>
         <div>
-          <label>Install Date:</label>
+          <label>Install date</label>
           <input
             type="date"
             value={installDate}
@@ -148,7 +148,7 @@ const InstallationForm = ({ onSubmit }) => {
 
       <div className="form-grid full-width">
         <div>
-          <label>Notes:</label>
+          <label>Notes</label>
           <textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
@@ -156,7 +156,7 @@ const InstallationForm = ({ onSubmit }) => {
         </div>
       </div>
 
-      <button type="submit">Add Installation</button>
+      <button type="submit">Save installation</button>
     </form>
   );
 };

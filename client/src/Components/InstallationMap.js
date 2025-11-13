@@ -289,8 +289,8 @@ const InstallationMap = ({ installations, theme = 'light', variant = 'standard' 
                           <PowerIcon size={18} />
                         </div>
                         <div className="popup-card-title-group">
-                          <h3 className="popup-card-title">{installation.homeownerName || 'Unnamed install'}</h3>
-                          <p className="popup-card-subtitle">{locationLine || 'Location pending'} {postalLine}</p>
+                          <h3 className="popup-card-title">{installation.homeownerName || 'Unnamed installation'}</h3>
+                          <p className="popup-card-subtitle">{locationLine || 'Location not set'} {postalLine}</p>
                         </div>
                       </header>
 

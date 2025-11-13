@@ -441,7 +441,7 @@ function App() {
               <LogoIcon size={34} className="app-title-icon" />
               <div className="app-title-text">
                 <h1>Installation Tracker</h1>
-                <p className="subtitle">Operational visibility for every install</p>
+                <p className="subtitle">Overview of all installations</p>
               </div>
             </div>
           </div>
@@ -486,8 +486,8 @@ function App() {
                 <MapIcon size={22} />
               </div>
               <div>
-                <h2>Command Center</h2>
-                <p className="section-subtitle">Live system telemetry across your install base</p>
+                <h2>Dashboard Overview</h2>
+                <p className="section-subtitle">Key numbers at a glance</p>
               </div>
             </div>
 
@@ -495,71 +495,71 @@ function App() {
               <article className="metric-card">
                 <div className="metric-card-header">
                   <ListIcon size={18} className="metric-icon" />
-                  <span className="metric-label">Total Installations</span>
+                  <span className="metric-label">Total installs</span>
                 </div>
                 <div className="metric-value">{formatNumber(analytics.totalInstallations)}</div>
-                <p className="metric-subtext">Across all tracked customers</p>
+                <p className="metric-subtext">All recorded jobs</p>
               </article>
 
               <article className="metric-card">
                 <div className="metric-card-header">
                   <PowerIcon size={18} className="metric-icon" />
-                  <span className="metric-label">Live Capacity</span>
+                  <span className="metric-label">Total capacity</span>
                 </div>
                 <div className="metric-value">{formatKw(analytics.totalCapacity)}</div>
-                <p className="metric-subtext">Aggregate generating potential</p>
+                <p className="metric-subtext">Combined system size</p>
               </article>
 
               <article className="metric-card">
                 <div className="metric-card-header">
                   <CalendarIcon size={18} className="metric-icon" />
-                  <span className="metric-label">Deployments 30 Days</span>
+                  <span className="metric-label">Installs last 30 days</span>
                 </div>
                 <div className="metric-value">{formatNumber(analytics.installationsLast30Days)}</div>
                 <p className="metric-subtext">
-                  {installations30DayDelta >= 0 ? '+' : ''}{formatNumber(installations30DayDelta)} vs prior 30 days
+                  {installations30DayDelta >= 0 ? '+' : ''}{formatNumber(installations30DayDelta)} vs previous 30 days
                 </p>
               </article>
 
               <article className="metric-card">
                 <div className="metric-card-header">
                   <NoteIcon size={18} className="metric-icon" />
-                  <span className="metric-label">Operational Notes</span>
+                  <span className="metric-label">Installations with notes</span>
                 </div>
                 <div className="metric-value">{formatPercent(notesCoveragePercent)}</div>
-                <p className="metric-subtext">Installs carrying field intelligence</p>
+                <p className="metric-subtext">Jobs that include notes</p>
               </article>
 
               <article className="metric-card">
                 <div className="metric-card-header">
                   <PowerIcon size={18} className="metric-icon" />
-                  <span className="metric-label">Avg. System Size</span>
+                  <span className="metric-label">Average system size</span>
                 </div>
                 <div className="metric-value">{averageSystemSizeDisplay} kW</div>
-                <p className="metric-subtext">Optimized array footprint</p>
+                <p className="metric-subtext">Average size across all jobs</p>
               </article>
 
               <article className="metric-card">
                 <div className="metric-card-header">
                   <LocationIcon size={18} className="metric-icon" />
-                  <span className="metric-label">Mapped Coverage</span>
+                  <span className="metric-label">Installations with map data</span>
                 </div>
                 <div className="metric-value">{formatPercent(geocodedCoveragePercent)}</div>
-                <p className="metric-subtext">{formatNumber(analytics.uniqueStates)} active regions</p>
+                <p className="metric-subtext">{formatNumber(analytics.uniqueStates)} states with installs</p>
               </article>
 
               <article className="metric-card">
                 <div className="metric-card-header">
                   <MapIcon size={18} className="metric-icon" />
-                  <span className="metric-label">Top Utility Territory</span>
+                  <span className="metric-label">Most common utility</span>
                 </div>
                 <div className="metric-value metric-value--compact">
                   {analytics.topUtility ? analytics.topUtility.name : '—'}
                 </div>
                 <p className="metric-subtext">
                   {analytics.topUtility
-                    ? `${formatPercent(analytics.topUtility.share * 100)} of portfolio`
-                    : 'Utility mapping updates live'}
+                    ? `${formatPercent(analytics.topUtility.share * 100)} of installs`
+                    : 'Utility data appears when available'}
                 </p>
               </article>
             </div>
@@ -569,8 +569,8 @@ function App() {
             <section className="command-panel command-panel--wide">
               <div className="panel-heading">
                 <div>
-                  <h3>Installation Log</h3>
-                  <p className="panel-subtitle">Comprehensive roster of active deployments</p>
+                  <h3>Installation list</h3>
+                  <p className="panel-subtitle">All installations in one place</p>
                 </div>
                 <span className="panel-meta">{formatNumber(analytics.totalInstallations)} records</span>
               </div>
@@ -584,8 +584,8 @@ function App() {
             <section className="command-panel command-panel--map">
               <div className="panel-heading">
                 <div>
-                  <h3>Geospatial Intelligence</h3>
-                  <p className="panel-subtitle">Situational awareness across the field</p>
+                  <h3>Installations map</h3>
+                  <p className="panel-subtitle">See every install on the map</p>
                 </div>
                 <div className="panel-actions">
                   <button
@@ -594,7 +594,7 @@ function App() {
                     onClick={openMapModal}
                   >
                     <ExpandIcon className="button-icon" size={16} />
-                    <span>Full View</span>
+                    <span>Open full map</span>
                   </button>
                   <span className="panel-meta">{formatPercent(geocodedCoveragePercent)} mapped</span>
                 </div>
@@ -605,10 +605,10 @@ function App() {
             <section className="command-panel command-panel--form">
               <div className="panel-heading">
                 <div>
-                  <h3>Rapid Deployment</h3>
-                  <p className="panel-subtitle">Launch a new installation mission</p>
+                  <h3>Add installation</h3>
+                  <p className="panel-subtitle">Enter a new installation</p>
                 </div>
-                <span className="panel-meta">Realtime sync</span>
+                <span className="panel-meta">Saves automatically</span>
               </div>
               <InstallationForm onSubmit={handleInstallationAdded} />
             </section>
@@ -616,13 +616,13 @@ function App() {
             <section className="command-panel command-panel--wide insights-panel">
               <div className="panel-heading">
                 <div>
-                  <h3>Operational Insights</h3>
-                  <p className="panel-subtitle">Decision-ready intelligence</p>
+                  <h3>Insights</h3>
+                  <p className="panel-subtitle">Recent highlights</p>
                 </div>
               </div>
               <div className="insights-grid">
                 <article className="insight-card">
-                  <h4>Latest Activation</h4>
+                  <h4>Latest installation</h4>
                   {analytics.latestInstallation ? (
                     <>
                       <p className="insight-primary">{analytics.latestInstallation.homeownerName}</p>
@@ -640,16 +640,16 @@ function App() {
                         })}
                       </p>
                       <p className="insight-note">
-                        {formatSystemSizeLabel(analytics.latestInstallation.systemSize)} array
+                        {formatSystemSizeLabel(analytics.latestInstallation.systemSize)} system
                       </p>
                     </>
                   ) : (
-                    <p className="insight-empty">Deployments will appear here once logged.</p>
+                    <p className="insight-empty">Add an installation to see it here.</p>
                   )}
                 </article>
 
                 <article className="insight-card">
-                  <h4>Regional Footprint</h4>
+                  <h4>Top states</h4>
                   {analytics.topStates.length > 0 ? (
                     <ul className="state-list">
                       {analytics.topStates.map(({ state, count, share }) => (
@@ -662,12 +662,12 @@ function App() {
                       ))}
                     </ul>
                   ) : (
-                    <p className="insight-empty">Regional telemetry will populate as installs roll in.</p>
+                    <p className="insight-empty">State data appears once installs are added.</p>
                   )}
                 </article>
 
                 <article className="insight-card">
-                  <h4>Recent Activity</h4>
+                  <h4>Recent activity</h4>
                   {analytics.recentActivity.length > 0 ? (
                     <ul className="activity-feed">
                       {analytics.recentActivity.map((inst) => {
@@ -691,12 +691,12 @@ function App() {
                       })}
                     </ul>
                   ) : (
-                    <p className="insight-empty">Log an installation to build mission history.</p>
+                    <p className="insight-empty">Add an installation to see recent activity.</p>
                   )}
                 </article>
 
                 <article className="insight-card">
-                  <h4>Utility Territories</h4>
+                  <h4>Utilities</h4>
                   {analytics.utilityDistribution.length > 0 ? (
                     <ul className="utility-list">
                       {analytics.utilityDistribution.map((entry) => (
@@ -718,7 +718,7 @@ function App() {
                       ))}
                     </ul>
                   ) : (
-                    <p className="insight-empty">Utility overlays populate as installs are mapped.</p>
+                    <p className="insight-empty">Utility data shows once installs include utility info.</p>
                   )}
                 </article>
               </div>
@@ -733,21 +733,21 @@ function App() {
               onClick={() => setActiveTab('form')}
             >
               <AddIcon className="tab-icon" size={18} />
-              <span className="tab-label">New Installation</span>
+              <span className="tab-label">Add installation</span>
             </button>
             <button
               className={`tab ${activeTab === 'list' ? 'active' : ''}`}
               onClick={() => setActiveTab('list')}
             >
               <ListIcon className="tab-icon" size={18} />
-              <span className="tab-label">Installation Log ({installations.length})</span>
+              <span className="tab-label">Installation list ({installations.length})</span>
             </button>
             <button
               className={`tab ${activeTab === 'map' ? 'active' : ''}`}
               onClick={() => setActiveTab('map')}
             >
               <MapIcon className="tab-icon" size={18} />
-              <span className="tab-label">Map Overview</span>
+              <span className="tab-label">Map</span>
             </button>
           </div>
 
@@ -777,7 +777,7 @@ function App() {
                     onClick={openMapModal}
                   >
                     <ExpandIcon className="button-icon" size={16} />
-                    <span>Full View</span>
+                    <span>Open full map</span>
                   </button>
                   <span className="panel-meta">{formatPercent(geocodedCoveragePercent)} mapped</span>
                 </div>
@@ -803,9 +803,9 @@ function App() {
           >
             <header className="map-modal__header">
               <div className="map-modal__title-block">
-                <h2 className="map-modal__title" id="map-modal-title">Geospatial Command</h2>
+                <h2 className="map-modal__title" id="map-modal-title">Map view</h2>
                 <p className="map-modal__subtitle" id="map-modal-description">
-                  Expanded mission view spanning every mapped installation
+                  Large map showing every installation
                 </p>
               </div>
               <div className="panel-actions map-modal__actions">
@@ -837,12 +837,12 @@ function App() {
           <div className="app-footer-brand">
             <LogoIcon size={32} className="app-footer-logo" aria-hidden="true" />
             <div className="app-footer-text">
-              <span className="app-footer-title">Solar Command</span>
-              <span className="app-footer-subtitle">Precision insight for every install</span>
+              <span className="app-footer-title">Installation Tracker</span>
+              <span className="app-footer-subtitle">Simple tracking for every install</span>
             </div>
           </div>
           <div className="app-footer-meta">
-            <span className="app-footer-badge">Orbiting since {currentYear}</span>
+            <span className="app-footer-badge">Tracking since {currentYear}</span>
             <nav className="app-footer-nav" aria-label="Footer links">
               <a href="#top" className="app-footer-link">Back to top</a>
               <a href="mailto:ops@solarcommand.io" className="app-footer-link">ops@solarcommand.io</a>
