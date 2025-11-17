@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import apiClient from './apiClient';
 import './App.css';
 import InstallationList from './Components/InstallationList';
-import InstallationForm from './Components/InstallationForm';
+import InstallationEntry from './Components/InstallationEntry';
 import InstallationMap from './Components/InstallationMap';
 import Login from './Components/Login';
 import AnimatedNumber from './Components/AnimatedNumber';
@@ -242,6 +242,23 @@ function App() {
       prev.map((inst) => (inst.id === updatedInstallation.id ? updatedInstallation : inst))
     );
   };
+
+  const handleBulkImportComplete = React.useCallback((newInstallations = []) => {
+    if (Array.isArray(newInstallations) && newInstallations.length > 0) {
+      setInstallations((prev) => {
+        const existingIds = new Set(prev.map((inst) => inst.id));
+        const additions = newInstallations.filter((inst) => inst && !existingIds.has(inst.id));
+        if (additions.length === 0) {
+          return prev;
+        }
+        return [...prev, ...additions];
+      });
+    }
+
+    if (!isDesktop) {
+      setActiveTab('list');
+    }
+  }, [isDesktop]);
 
   const installationsWithTerritory = useMemo(
     () =>
@@ -640,11 +657,14 @@ function App() {
               <div className="panel-heading">
                 <div>
                   <h3>Add installation</h3>
-                  <p className="panel-subtitle">Enter a new installation</p>
+                  <p className="panel-subtitle">Manual entry or CSV upload</p>
                 </div>
-                <span className="panel-meta">Saves automatically</span>
+                <span className="panel-meta">Single or bulk</span>
               </div>
-              <InstallationForm onSubmit={handleInstallationAdded} />
+              <InstallationEntry
+                onSingleSubmit={handleInstallationAdded}
+                onBulkComplete={handleBulkImportComplete}
+              />
             </section>
 
             <section className="command-panel command-panel--wide insights-panel">
@@ -794,7 +814,10 @@ function App() {
           <div className="tab-content">
             {activeTab === 'form' && (
               <div className="tab-panel">
-                <InstallationForm onSubmit={handleInstallationAdded} />
+                <InstallationEntry
+                  onSingleSubmit={handleInstallationAdded}
+                  onBulkComplete={handleBulkImportComplete}
+                />
               </div>
             )}
 

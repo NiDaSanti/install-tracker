@@ -40,13 +40,11 @@ async function readInstallations(filePath, user) {
       await fs.mkdir(path.dirname(filePath), { recursive: true });
 
       if (PER_USER_STORAGE && user && filePath !== SHARED_DATA_FILE) {
-        // Fallback: attempt to seed the per-user file from the shared file if it exists
         try {
           const sharedRaw = await fs.readFile(SHARED_DATA_FILE, 'utf-8');
           const sharedInstallations = JSON.parse(sharedRaw);
           const owned = sharedInstallations.filter((installation) => (
-            installation.ownerId === user.id
-            || installation.ownerUsername === user.username
+            installation.ownerId === user.id || installation.ownerUsername === user.username
           ));
           await fs.writeFile(filePath, JSON.stringify(owned, null, 2));
           return owned;
@@ -111,6 +109,65 @@ async function deleteInstallation(id, filePath, user) {
   return true;
 }
 
+function buildInstallationPayload(raw = {}, user) {
+  const homeownerName = raw.homeownerName ? String(raw.homeownerName).trim() : '';
+  const address = raw.address ? String(raw.address).trim() : '';
+  const city = raw.city ? String(raw.city).trim() : '';
+  const state = raw.state ? String(raw.state).trim().toUpperCase() : '';
+  const zip = raw.zip ? String(raw.zip).trim() : '';
+  const systemSize = raw.systemSize;
+
+  const errors = [];
+
+  if (!homeownerName || homeownerName.length < 2) {
+    errors.push('Homeowner name must be at least 2 characters');
+  }
+
+  if (!address) {
+    errors.push('Street address is required');
+  }
+
+  if (!city) {
+    errors.push('City is required');
+  }
+
+  if (!state) {
+    errors.push('State is required');
+  }
+
+  if (!zip) {
+    errors.push('ZIP is required');
+  }
+
+  const numericSystemSize = Number.parseFloat(systemSize);
+  if (!Number.isFinite(numericSystemSize) || numericSystemSize <= 0) {
+    errors.push('System size must be a positive number');
+  }
+
+  if (errors.length > 0) {
+    return { errors };
+  }
+
+  return {
+    installation: {
+      id: `${Date.now()}-${Math.random().toString(16).slice(2, 10)}`,
+      homeownerName,
+      address,
+      city,
+      state,
+      zip,
+      systemSize: numericSystemSize,
+      installDate: raw.installDate ? String(raw.installDate).trim() : null,
+      notes: raw.notes ? String(raw.notes).trim() : '',
+      latitude: raw.latitude ?? null,
+      longitude: raw.longitude ?? null,
+      createdAt: new Date().toISOString(),
+      ownerId: user?.id || null,
+      ownerUsername: user?.username || null
+    }
+  };
+}
+
 // GET all installations
 router.get('/', async (req, res) => {
   try {
@@ -139,42 +196,64 @@ router.get('/:id', async (req, res) => {
 // POST create new installation
 router.post('/', async (req, res) => {
   try {
-    // Validation
-    const { homeownerName, address, city, state, zip, systemSize } = req.body;
-    
-    if (!homeownerName || !address || !city || !state || !zip || !systemSize) {
-      return res.status(400).json({ error: 'Missing required fields' });
+    const { installation, errors } = buildInstallationPayload(req.body, req.user);
+
+    if (errors) {
+      return res.status(400).json({ error: errors.join(', ') });
     }
 
-    if (homeownerName.length < 2) {
-      return res.status(400).json({ error: 'Homeowner name must be at least 2 characters' });
-    }
-
-    if (isNaN(parseFloat(systemSize)) || parseFloat(systemSize) <= 0) {
-      return res.status(400).json({ error: 'System size must be a positive number' });
-    }
-
-    const newInstallation = {
-      id: Date.now().toString(),
-      homeownerName: homeownerName.trim(),
-      address: address.trim(),
-      city: city.trim(),
-      state: state.trim(),
-      zip: zip.trim(),
-      systemSize: systemSize,
-      installDate: req.body.installDate,
-      notes: req.body.notes ? req.body.notes.trim() : '',
-      latitude: req.body.latitude || null,
-      longitude: req.body.longitude || null,
-      createdAt: new Date().toISOString(),
-      ownerId: req.user?.id || null,
-      ownerUsername: req.user?.username || null
-    };
     const dataFile = getDataFileForUser(req.user);
-    const added = await addInstallation(newInstallation, dataFile, req.user);
+    const added = await addInstallation(installation, dataFile, req.user);
     res.status(201).json(added);
   } catch (error) {
     console.error('Error creating installation:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// POST bulk create installations
+router.post('/bulk', async (req, res) => {
+  try {
+    const incoming = Array.isArray(req.body.installations) ? req.body.installations : [];
+
+    if (incoming.length === 0) {
+      return res.status(400).json({ error: 'No installations provided for bulk upload' });
+    }
+
+    const results = incoming.map((item, index) => {
+      const payload = buildInstallationPayload(item, req.user);
+      if (payload.errors) {
+        return {
+          index,
+          errors: payload.errors
+        };
+      }
+      return {
+        index,
+        installation: payload.installation
+      };
+    });
+
+    const failures = results.filter((entry) => entry.errors);
+    if (failures.length > 0) {
+      return res.status(400).json({
+        error: 'Some rows contain invalid data',
+        failures
+      });
+    }
+
+    const dataFile = getDataFileForUser(req.user);
+    const existing = await readInstallations(dataFile, req.user);
+    const installationsToAdd = results.map((entry) => entry.installation);
+    const updated = [...existing, ...installationsToAdd];
+    await writeInstallations(dataFile, updated);
+
+    res.status(201).json({
+      added: installationsToAdd.length,
+      installations: installationsToAdd
+    });
+  } catch (error) {
+    console.error('Error performing bulk installation upload:', error);
     res.status(500).json({ error: error.message });
   }
 });

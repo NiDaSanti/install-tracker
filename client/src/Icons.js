@@ -64,6 +64,16 @@ export function MapIcon({ size = 18, color = 'currentColor', className }) {
   );
 }
 
+export function UploadIcon({ size = 18, color = 'currentColor', className }) {
+  return (
+    <SvgIcon size={size} color={color} className={className}>
+      <path d="M12 20v-7" />
+      <path d="m9 11 3-3 3 3" />
+      <path d="M5 14v5h14v-5" />
+    </SvgIcon>
+  );
+}
+
 export function ExpandIcon({ size = 18, color = 'currentColor', className }) {
   return (
     <SvgIcon size={size} color={color} className={className}>
