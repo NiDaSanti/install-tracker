@@ -15,6 +15,14 @@ const PER_USER_DATA_DIR = process.env.INSTALLATIONS_DATA_DIR
   ? path.resolve(process.env.INSTALLATIONS_DATA_DIR)
   : path.join(__dirname, '../data/installations');
 
+function getLegacyUserFile(user) {
+  if (!user || !user.username) {
+    return null;
+  }
+  const safeUsername = sanitizeUsername(user.username);
+  return path.join(PER_USER_DATA_DIR, `${safeUsername}.json`);
+}
+
 function sanitizeUsername(username = '') {
   return username
     .toLowerCase()
@@ -40,14 +48,45 @@ async function readInstallations(filePath, user) {
       await fs.mkdir(path.dirname(filePath), { recursive: true });
 
       if (PER_USER_STORAGE && user && filePath !== SHARED_DATA_FILE) {
+        const legacyFile = getLegacyUserFile(user);
+        if (legacyFile && legacyFile !== filePath) {
+          try {
+            const legacyRaw = await fs.readFile(legacyFile, 'utf-8');
+            const legacyInstallations = JSON.parse(legacyRaw);
+            await fs.writeFile(filePath, JSON.stringify(legacyInstallations, null, 2));
+            return legacyInstallations;
+          } catch (legacyError) {
+            if (legacyError.code !== 'ENOENT') {
+              console.warn('Unable to migrate legacy installations file:', legacyError);
+            }
+          }
+        }
+      }
+
+      if (PER_USER_STORAGE && user && filePath !== SHARED_DATA_FILE) {
         try {
           const sharedRaw = await fs.readFile(SHARED_DATA_FILE, 'utf-8');
           const sharedInstallations = JSON.parse(sharedRaw);
           const owned = sharedInstallations.filter((installation) => (
             installation.ownerId === user.id || installation.ownerUsername === user.username
           ));
-          await fs.writeFile(filePath, JSON.stringify(owned, null, 2));
-          return owned;
+
+          const hasOwnershipMetadata = sharedInstallations.some((installation) => (
+            installation.ownerId || installation.ownerUsername
+          ));
+
+          const withOwnership = owned.length > 0
+            ? owned
+            : !hasOwnershipMetadata
+              ? sharedInstallations.map((installation) => ({
+                  ...installation,
+                  ownerId: user.id ?? installation.ownerId ?? null,
+                  ownerUsername: user.username ?? installation.ownerUsername ?? null
+                }))
+              : [];
+
+          await fs.writeFile(filePath, JSON.stringify(withOwnership, null, 2));
+          return withOwnership;
         } catch (sharedError) {
           if (sharedError.code !== 'ENOENT') {
             console.warn('Unable to seed per-user installations:', sharedError);

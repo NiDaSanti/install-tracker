@@ -1,182 +1,206 @@
 # Installation Tracker
 
-A professional web application for tracking and managing solar panel installations (or any home system installations).
+Installation Tracker is a full-stack workspace for operations teams to record, visualize, and manage residential solar (or similar field-service) installations. The app brings together fast data entry, CSV bulk import, geocoded mapping, and lightweight analytics in a single dashboard.
 
-## Features
+## Highlights
 
-- ✅ Add, edit, and delete installations
-- ✅ Track homeowner info, address, system size, and install dates
-- ✅ Interactive map view with geocoding
-- ✅ Professional tabbed interface
-- ✅ Responsive design
-- ✅ RESTful API backend
+- Responsive React dashboard with list, map, and analytics views
+- Single-install form with built-in geocoding validation
+- Bulk CSV uploader that surfaces row-level issues before sending data
+- Secure API with per-user data isolation (optional) backed by JSON storage
+- CLI utility to convert CSV files into API-ready JSON payloads
+- Render-friendly deployment instructions for both frontend and backend
 
-## Tech Stack
+## How the App Works
 
-**Frontend:**
-- React 19
-- Leaflet (React Leaflet) for maps
-- Axios for API calls
-- CSS3 for styling
+1. **Authenticate & Load** – Users sign in, the client stores a JWT, and requests begin flowing through the shared Axios client.
+2. **Dashboard Overview** – The desktop layout shows key metrics, the master installation list, an interactive Leaflet map, and a dedicated panel for adding installations; tablets/phones switch to tabbed navigation.
+3. **Single Entry Mode** – The manual form gathers homeowner demographics, validates inputs, geocodes the address, and posts to `POST /api/installations`. Successful saves append the record to the in-memory list without a full reload.
+4. **Bulk Upload Mode** – Operators can download a pre-formatted CSV template, drag in up to 150 rows, and the client validates every row (required columns, positive system size, numeric coordinates). Only clean rows are sent to `POST /api/installations/bulk`; any server-side validation problems cascade back into the UI with pointers to the offending rows.
+5. **Mapping & Analytics** – Installations render as map markers (with territory overlays) and feed summary widgets that compute totals, deltas, and top segments in real time.
 
-**Backend:**
-- Node.js
-- Express 5
-- JSON file storage
-- Nominatim geocoding API
+## Quick Start
 
-## Prerequisites
+### Prerequisites
 
-- Node.js 18+ installed
-- npm or yarn
+- Node.js 18 or newer
+- npm (bundled with Node)
 
-## Installation & Setup
+### 1. Clone & Install
 
-### 1. Clone the repository
 ```bash
 git clone <your-repo-url>
 cd install-tracker
-```
 
-### 2. Backend Setup
-```bash
+# Backend
 cd server
 npm install
 cp .env.example .env
-```
 
-Edit `.env` and configure:
-```
-PORT=3000
-NODE_ENV=development
-CLIENT_URL=http://localhost:3001
-```
-
-### 3. Frontend Setup
-```bash
+# Frontend
 cd ../client
 npm install
 cp .env.example .env
 ```
 
-Edit `.env`:
-```
-REACT_APP_API_BASE_URL=http://localhost:3000
-```
+### 2. Configure Environment
 
-### 4. Run the Application
+`server/.env` (minimum)
 
-**Start Backend (Terminal 1):**
-```bash
-cd server
-npm run dev
-```
-
-**Start Frontend (Terminal 2):**
-```bash
-cd client
-npm start
-```
-
-The app will open at `http://localhost:3001`
-
-## Project Structure
-
-```
-install-tracker/
-├── server/
-│   ├── data/
-│   │   ├── installations.development.json
-│   │   └── installations.production.json
-│   ├── routes/
-│   │   ├── index.js              # Main routes
-│   │   └── installations.js      # Installation CRUD
-│   ├── index.js                  # Server entry point
-│   ├── package.json
-│   └── .env
-└── client/
-    ├── src/
-    │   ├── Components/
-    │   │   ├── InstallationForm.js
-    │   │   ├── InstallationList.js
-    │   │   └── InstallationMap.js
-    │   ├── utils/
-    │   │   └── geocode.js         # Address geocoding
-    │   ├── App.js                 # Main component
-    │   └── App.css                # Styles
-    ├── package.json
-    └── .env
-```
-
-## API Endpoints
-
-### Installations
-
-- `GET /api/installations` - Get all installations
-- `GET /api/installations/:id` - Get single installation
-- `POST /api/installations` - Create new installation
-- `PUT /api/installations/:id` - Update installation
-- `DELETE /api/installations/:id` - Delete installation
-
-### Health Check
-
-- `GET /health` - Server health check
-
-## Environment Variables
-
-### Server (.env)
 ```
 PORT=3000
 NODE_ENV=development
 CLIENT_URL=http://localhost:3001
 ```
 
-### Client (.env)
+`client/.env`
+
 ```
 REACT_APP_API_BASE_URL=http://localhost:3000
 ```
 
-## Deployment
+Optional server flags:
 
-### Backend Deployment (Render)
+- `INSTALLATIONS_PER_USER=true` – isolate data per authenticated user (defaults to true).
+- `INSTALLATIONS_DATA_FILE` – override the shared JSON filename.
+- `INSTALLATIONS_DATA_DIR` – custom directory for per-user storage.
 
-1. Push code to GitHub.
-2. Create a new **Web Service** in Render pointed at the repository root.
-3. Build command: `cd server && npm install`.
-4. Start command: `cd server && npm start`.
-5. Add a persistent disk (1 GB is plenty) mounted at `/opt/render/project/src/server/data` so JSON data survives deploys.
-6. Configure environment variables:
-   - `NODE_ENV=production`
-   - `CLIENT_URL=https://<your-frontend-onrender-url>`
-   - `INSTALLATIONS_DATA_FILE=installations.production.json` (optional override; defaults to production file when `NODE_ENV=production`).
+### 3. Run Locally
 
-### Frontend Deployment (Render Static Site)
+```bash
+# Terminal 1 – API
+cd server
+npm run dev
 
-1. Create a **Static Site** on Render using the same repo.
-2. Build command: `cd client && npm install && npm run build`.
-3. Publish directory: `client/build`.
-4. Environment variable:
-   - `REACT_APP_API_BASE_URL=https://<your-backend-onrender-url>`
-5. After the first deploy note the static site URL and update the backend `CLIENT_URL` value to match exactly.
+# Terminal 2 – React app
+cd client
+npm start
+```
 
-## Features to Add
+Frontend boots at `http://localhost:3001`, proxied through `client/package.json` to reach the API.
 
-- [ ] User authentication
-- [ ] Database migration (PostgreSQL/MongoDB)
-- [ ] Export to CSV
-- [ ] Search and filter
-- [ ] Auto-zoom map to markers
-- [ ] Email notifications
-- [ ] Multi-user support
+## Using Bulk Upload
 
-## License
+### In the UI
 
-MIT
+1. Navigate to **Add installation → Bulk upload**.
+2. Download the sample template (`client/public/templates/installations-template.csv`) if needed.
+3. Select your CSV; invalid rows are highlighted with exact reasons (missing homeowner, bad coordinates, etc.).
+4. Fix issues until the summary shows “0 rows need attention,” then press **Upload**.
+5. Successful imports immediately appear in the list, map, and analytics; mobile users are bounced to the list tab automatically.
 
-## Author
+### From the CLI
 
-Nick
+```
+cd server
+npm run bulk:prepare -- ../data/my-installs.csv payload.json
 
-## Support
+# Then
+curl -X POST http://localhost:3000/api/installations/bulk \
+   -H 'Content-Type: application/json' \
+   -H 'Authorization: Bearer <token>' \
+   -d @payload.json
+```
 
-For issues and questions, please open an issue on GitHub.
+`bulk:prepare` mirrors the client-side validation and produces JSON the API accepts.
+
+## Tech Stack
+
+| Layer    | Tools |
+|----------|-------|
+| Frontend | React 19, React Router (built-in page flow), Axios, React Leaflet, Papaparse, custom CSS |
+| Backend  | Node.js, Express 5, JSON file persistence, dotenv |
+| Utilities | Geocoding via Nominatim, csv-parse for CLI conversions |
+
+## Project Layout (selected files)
+
+```
+install-tracker/
+├── server/
+│   ├── data/                          # JSON persistence (auto-created)
+│   ├── routes/
+│   │   └── installations.js           # CRUD + bulk endpoints
+│   ├── scripts/
+│   │   └── csv-to-bulk.js             # CSV → JSON helper
+│   ├── index.js
+│   └── package.json
+└── client/
+      ├── public/
+      │   └── templates/
+      │       └── installations-template.csv
+      ├── src/
+      │   ├── Components/
+      │   │   ├── InstallationEntry.js   # Toggle between single and bulk modes
+      │   │   ├── InstallationForm.js
+      │   │   ├── BulkUpload.js
+      │   │   ├── InstallationList.js
+      │   │   ├── InstallationMap.js
+      │   │   └── Login.js
+      │   ├── utils/
+      │   │   └── geocode.js
+      │   ├── apiClient.js               # Axios instance with auth interceptor
+      │   ├── App.js / App.css
+      │   └── Icons.js
+      └── package.json
+```
+
+## API Overview
+
+All routes are prefixed with `/api` on the server.
+
+| Method | Route                         | Description |
+|--------|-------------------------------|-------------|
+| GET    | `/installations`              | Fetch all installations for the current user |
+| GET    | `/installations/:id`          | Fetch a single installation |
+| POST   | `/installations`              | Create one installation (form submission) |
+| POST   | `/installations/bulk`         | Create many installations at once |
+| PUT    | `/installations/:id`          | Update an installation |
+| DELETE | `/installations/:id`          | Remove an installation |
+
+Non-namespaced endpoints:
+
+- `GET /health` – service liveness probe.
+
+## Data & Validation
+
+- Records include homeowner details, location, system size, optional coordinates, and timestamps.
+- IDs are generated server-side (`<timestamp>-<random>`), and owner metadata is derived from `req.user`.
+- Bulk uploads reject any row with missing required fields or non-positive system size; the API responds with a list of failed indices so the client can surface them.
+- When per-user storage is enabled, each user’s data is persisted to `server/data/installations/<username>.development.json` and optionally seeded from the shared file the first time they sign in.
+
+## Deployment Tips (Render)
+
+### Backend Web Service
+
+| Setting          | Value |
+|------------------|-------|
+| Build Command    | `cd server && npm install` |
+| Start Command    | `cd server && npm start` |
+| Persistent Disk  | Mount at `/opt/render/project/src/server/data` (≥1 GB) |
+| Environment Vars | `NODE_ENV=production`, `CLIENT_URL=https://<frontend-url>` |
+
+Optional: set `INSTALLATIONS_DATA_FILE=installations.production.json` for clarity.
+
+### Frontend Static Site
+
+| Setting          | Value |
+|------------------|-------|
+| Build Command    | `cd client && npm install && npm run build` |
+| Publish Directory| `client/build` |
+| Environment Vars | `REACT_APP_API_BASE_URL=https://<backend-url>` |
+
+After the first deploy, update the backend `CLIENT_URL` to the final static site URL to satisfy CORS.
+
+## Roadmap Ideas
+
+- Authentication backed by a persistent database
+- Rich filtering and search across installations
+- Export / reporting pipeline
+- Map clustering and territory overlays sourced from a GIS service
+- Webhooks or email alerts for new installs
+
+## Support & Contributing
+
+Issues, enhancement ideas, and bug reports are welcome—open a GitHub issue or submit a pull request.
+
+License: MIT • Author: Nick
